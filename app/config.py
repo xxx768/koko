@@ -6,22 +6,22 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # Application
-    app_name: str = "SecureAuth"
-    app_env: str = "development"
-    secret_key: str = "change-this-in-production"
+    app_name: str = "Nova Earns"
+    app_env: str = "production"
+    secret_key: str = ""
     debug: bool = False
 
     # Database
-    database_url: str = "sqlite+aiosqlite:///./dev.db"
+    database_url: str = "sqlite:///./test.db"
 
     # JWT
-    jwt_secret_key: str = "change-this-jwt-secret-in-production"
+    jwt_secret_key: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
 
     # Email
-    resend_api_key: str = "re_Q9cpLf4j_75MPbbVhDgTykBUpYs56RmwC"
+    resend_api_key: str 
     email_from: str = "Nova Earns <onboarding@onboarding.novaearns.online>"
 
     # CORS

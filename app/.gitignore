@@ -22,3 +22,6 @@ env/
 htmlcov/
 .coverage
 coverage.xml
+.env
+.env.*
+!.env.example
