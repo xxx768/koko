@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Insights – Nova Earns</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+
+
+  <link rel="stylesheet" href="/static/output.css" />
+  <script src="/static/lucide.js"></script>
+
+  <style>
+    /* ----- base reset & theme (matches dashboard) ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #09090B;
+      color: #FFFFFF;
+      min-height: 100vh;
+      padding-bottom: 88px; /* space for fixed bottom nav */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* glassmorphism */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    }
+    .glass-card-light {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(139, 92, 246, 0.10);
+    }
+
+    /* sticky header */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(9, 9, 11, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(139, 92, 246, 0.08);
+    }
+
+    /* max-width container */
+    .app-container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* avatar ring */
+    .avatar-ring {
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25), 0 0 20px rgba(139, 92, 246, 0.10);
+    }
+
+    /* tap targets */
+    .tap-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* bottom nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      height: 72px;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(139, 92, 246, 0.10);
+      box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: stretch;
+      justify-content: space-around;
+      padding: 4px 6px 8px;
+      max-width: 480px;
+      margin: 0 auto;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+    }
+    @media (min-width: 480px) {
+      .bottom-nav {
+        padding: 4px 12px 8px;
+      }
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 6px 0;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      color: #6B7280;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      min-height: 52px;
+      min-width: 52px;
+      position: relative;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-item:hover {
+      color: #C4B5FD;
+    }
+    .nav-item.active {
+      color: #8B5CF6;
+    }
+    .nav-item.active .nav-icon {
+      color: #8B5CF6;
+    }
+    .nav-item .nav-icon {
+      width: 22px;
+      height: 22px;
+      transition: all 0.2s ease;
+      color: currentColor;
+    }
+    .nav-item.active .nav-icon {
+      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+    }
+    .nav-item-logout {
+      color: #6B7280;
+    }
+    .nav-item-logout:hover {
+      color: #F87171;
+    }
+    .nav-item-logout.active {
+      color: #EF4444;
+    }
+    .nav-item-logout.active .nav-icon {
+      color: #EF4444;
+    }
+
+    /* override old insight styles with dark theme */
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .page-sub {
+      color: #9CA3AF;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    /* overview cards */
+    .card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(139, 92, 246, 0.10);
+      border-radius: 12px;
+      padding: 16px 14px;
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(139, 92, 246, 0.25);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    .card-label {
+      font-size: 10px;
+      color: #9CA3AF;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .card-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+    .card-value.green { color: #22C55E; }
+    .card-value.red   { color: #EF4444; }
+    .card-value.indigo { color: #8B5CF6; }
+
+    /* section (glass) */
+    .section {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .section-header {
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #FFFFFF;
+    }
+    .section-meta {
+      font-size: 12px;
+      color: #9CA3AF;
+    }
+
+    /* bar chart */
+    .chart-wrap {
+      padding: 16px 18px 10px;
+    }
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 140px;
+    }
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .bar-amount {
+      font-size: 10px;
+      color: #9CA3AF;
+      white-space: nowrap;
+    }
+    .bar {
+      width: 100%;
+      background: #8B5CF6;
+      border-radius: 6px 6px 0 0;
+      min-height: 4px;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .bar:hover {
+      background: #A855F7;
+      opacity: 0.9;
+    }
+    .bar-day {
+      font-size: 10px;
+      color: #9CA3AF;
+      margin-top: 4px;
+    }
+    .chart-empty {
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9CA3AF;
+      font-size: 14px;
+    }
+
+    /* filter tabs */
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 12px 18px 0;
+      flex-wrap: wrap;
+    }
+    .filter-tab {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(139, 92, 246, 0.20);
+      background: transparent;
+      color: #9CA3AF;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-tab:hover {
+      border-color: #8B5CF6;
+      color: #C4B5FD;
+    }
+    .filter-tab.active {
+      background: #8B5CF6;
+      color: #FFFFFF;
+      border-color: #8B5CF6;
+    }
+
+    /* transaction list */
+    .tx-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .tx-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .tx-item:last-child {
+      border-bottom: none;
+    }
+    .tx-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .tx-icon.credit {
+      background: rgba(34, 197, 94, 0.15);
+    }
+    .tx-icon.debit {
+      background: rgba(239, 68, 68, 0.15);
+    }
+    .tx-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .tx-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #FFFFFF;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tx-date {
+      font-size: 12px;
+      color: #9CA3AF;
+      margin-top: 2px;
+    }
+    .tx-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .tx-amount {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .tx-amount.credit {
+      color: #22C55E;
+    }
+    .tx-amount.debit {
+      color: #EF4444;
+    }
+    .tx-status {
+      font-size: 10px;
+      margin-top: 3px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.08);
+      color: #9CA3AF;
+    }
+    .tx-status.completed {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22C55E;
+    }
+    .tx-status.processing {
+      background: rgba(96, 165, 250, 0.15);
+      color: #60A5FA;
+    }
+    .tx-status.under-review {
+      background: rgba(250, 204, 21, 0.15);
+      color: #FACC15;
+    }
+    .tx-status.pending-payment {
+      background: rgba(251, 191, 36, 0.15);
+      color: #F59E0B;
+    }
+    .tx-status.rejected {
+      background: rgba(239, 68, 68, 0.15);
+      color: #EF4444;
+    }
+    .tx-empty {
+      padding: 36px 20px;
+      text-align: center;
+      color: #9CA3AF;
+      font-size: 14px;
+    }
+
+    /* state messages */
+    .state-msg {
+      text-align: center;
+      padding: 60px 20px;
+      color: #9CA3AF;
+      font-size: 15px;
+    }
+    .state-msg.error {
+      color: #EF4444;
+    }
+
+    /* responsive grid for cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    /* fade-in */
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* scrollbar hide */
+    ::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== STICKY HEADER ====== -->
+  <header class="sticky-header app-container w-full py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3 min-w-0">
+      <a href="/dashboard" class="tap-target flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors" aria-label="Back to Dashboard">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </a>
+      <h1 class="text-base font-semibold text-white truncate">Insights</h1>
+    </div>
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white font-semibold text-xs avatar-ring">
+        <span id="avatarInitial" class="uppercase">U</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====== MAIN CONTENT ====== -->
+  <main class="app-container w-full pt-4 pb-6">
+
+    <h1 class="page-title">Insights</h1>
+    <p class="page-sub">Your earnings, activity, and financial overview</p>
+
+    <div id="loadingState" class="state-msg">Loading your insights…</div>
+    <div id="errorState" class="state-msg error" style="display:none;">Failed to load insights. Please try again.</div>
+
+    <div id="insightsContent" style="display:none;" class="fade-in">
+
+      <!-- Overview cards -->
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-label">Total Earned</div>
+          <div class="card-value green" id="ovTotalEarned">—</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Daily Bonuses</div>
+          <div class="card-value indigo" id="ovBonus">—</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Referral Rewards</div>
+          <div class="card-value indigo" id="ovReferral">—</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Total Withdrawn</div>
+          <div class="card-value red" id="ovWithdrawn">—</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Pending Withdrawal</div>
+          <div class="card-value" id="ovPending">—</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Current Balance</div>
+          <div class="card-value green" id="ovBalance">—</div>
+        </div>
+      </div>
+
+      <!-- Weekly earnings chart -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">Weekly Earnings</span>
+          <span class="section-meta">Last 7 days</span>
+        </div>
+        <div class="chart-wrap">
+          <div id="barChart" class="bar-chart"></div>
+        </div>
+      </div>
+
+      <!-- Transactions -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">Recent Activity</span>
+          <span class="section-meta" id="txCount"></span>
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-filter="all">All</button>
+          <button class="filter-tab" data-filter="daily_bonus">Daily Bonus</button>
+          <button class="filter-tab" data-filter="referral_reward">Referrals</button>
+          <button class="filter-tab" data-filter="withdrawal">Withdrawals</button>
+        </div>
+        <ul class="tx-list" id="txList"></ul>
+      </div>
+
+    </div><!-- /insightsContent -->
+  </main>
+
+  <!-- ====== FIXED BOTTOM NAVIGATION ====== -->
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <!-- Home -->
+    <a href="/dashboard" class="nav-item" aria-label="Home">
+      <i data-lucide="house" class="nav-icon"></i>
+      <span>Home</span>
+    </a>
+    <!-- Surveys -->
+    <a href="/survey-user" class="nav-item" aria-label="Surveys">
+      <i data-lucide="clipboard-list" class="nav-icon"></i>
+      <span>Surveys</span>
+    </a>
+    <!-- Insights (active) -->
+    <a href="/insights" class="nav-item active" aria-label="Insights">
+      <i data-lucide="bar-chart-3" class="nav-icon"></i>
+      <span>Insights</span>
+    </a>
+    <!-- Notifications -->
+    <a href="/notifications-page" class="nav-item" aria-label="Notifications">
+      <i data-lucide="bell" class="nav-icon"></i>
+      <span>Alerts</span>
+    </a>
+    <!-- Logout (preserves logoutBtn ID) -->
+    <a href="#" id="logoutBtn" class="nav-item nav-item-logout" aria-label="Logout">
+      <i data-lucide="log-out" class="nav-icon"></i>
+      <span>Logout</span>
+    </a>
+  </nav>
+
+  <!-- ====== JAVASCRIPT (100% preserved) ====== -->
+  <script>
+    const token = sessionStorage.getItem('access_token');
+    if (!token) window.location.href = '/login';
+
+    // ── Formatting helpers ────────────────────────────────────────────────
+    function fmt(amount) {
+      return '₦' + Number(amount).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+             + ' · ' + d.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function shortDay(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('en-NG', { weekday: 'short' });
+    }
+
+    // ── Icons ────────────────────────────────────────────────────────────
+    const TX_ICONS = {
+      daily_bonus:     '🎁',
+      referral_reward: '👥',
+      withdrawal:      '💸',
+    };
+
+    // ── Status slug → CSS class ───────────────────────────────────────────
+    function statusClass(s) {
+      return s.toLowerCase().replace(/\s+/g, '-');
+    }
+
+    // ── Bar chart renderer ───────────────────────────────────────────────
+    function renderChart(weeklyData) {
+      const el = document.getElementById('barChart');
+      const max = Math.max(...weeklyData.map(d => d.amount), 1);
+
+      if (weeklyData.every(d => d.amount === 0)) {
+        el.outerHTML = '<div class="chart-empty">No earnings in the last 7 days</div>';
+        return;
+      }
+
+      el.innerHTML = weeklyData.map(d => {
+        const pct = Math.round((d.amount / max) * 100);
+        const height = Math.max(pct, 3);
+        return `
+          <div class="bar-col">
+            ${d.amount > 0 ? `<span class="bar-amount">${fmt(d.amount)}</span>` : ''}
+            <div class="bar" style="height:${height}%" title="${fmt(d.amount)} on ${d.date}"></div>
+            <span class="bar-day">${shortDay(d.date)}</span>
+          </div>`;
+      }).join('');
+    }
+
+    // ── Transaction renderer ─────────────────────────────────────────────
+    let allTx = [];
+
+    function renderTx(filter) {
+      const list = document.getElementById('txList');
+      const filtered = filter === 'all' ? allTx : allTx.filter(t => t.type === filter);
+
+      document.getElementById('txCount').textContent =
+        filtered.length + ' transaction' + (filtered.length !== 1 ? 's' : '');
+
+      if (!filtered.length) {
+        list.innerHTML = '<li class="tx-empty">No transactions found.</li>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(tx => `
+        <li class="tx-item">
+          <div class="tx-icon ${tx.direction}">${TX_ICONS[tx.type] || '💰'}</div>
+          <div class="tx-info">
+            <div class="tx-label">${tx.label}</div>
+            <div class="tx-date">${fmtDate(tx.timestamp)}</div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amount ${tx.direction}">
+              ${tx.direction === 'credit' ? '+' : '-'}${fmt(tx.amount)}
+            </div>
+            <span class="tx-status ${statusClass(tx.status)}">${tx.status}</span>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    // ── Filter tab logic ──────────────────────────────────────────────────
+    document.querySelectorAll('.filter-tab').forEach(btn => {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        renderTx(this.dataset.filter);
+      });
+    });
+
+    // ── Load data ─────────────────────────────────────────────────────────
+    async function loadInsights() {
+      try {
+        const res = await fetch('/api/insights', {
+          headers: { 'Authorization': 'Bearer ' + token },
+        });
+        if (res.status === 401) { window.location.href = '/login'; return; }
+        if (!res.ok) throw new Error('Server error');
+
+        const data = await res.json();
+
+        // Overview
+        const ov = data.overview;
+        document.getElementById('ovTotalEarned').textContent = fmt(ov.total_earned);
+        document.getElementById('ovBonus').textContent       = fmt(ov.daily_bonus_total);
+        document.getElementById('ovReferral').textContent    = fmt(ov.referral_reward_total);
+        document.getElementById('ovWithdrawn').textContent   = fmt(ov.total_withdrawn);
+        document.getElementById('ovPending').textContent     = fmt(ov.pending_withdrawal);
+        document.getElementById('ovBalance').textContent     = fmt(ov.current_balance);
+
+        // Chart
+        renderChart(data.weekly_chart);
+
+        // Transactions
+        allTx = data.transactions;
+        renderTx('all');
+
+        // Show
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('insightsContent').style.display = 'block';
+
+        // set avatar initial
+        setAvatar();
+
+      } catch (err) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('errorState').style.display = 'block';
+      }
+    }
+
+    // ── Logout ────────────────────────────────────────────────────────────
+    document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+      e.preventDefault();
+      const refresh = sessionStorage.getItem('refresh_token');
+      await fetch('/auth/logout', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refresh }),
+      });
+      sessionStorage.clear();
+      window.location.href = '/login';
+    });
+
+    // ── Helper: set avatar initial ──────────────────────────────────────
+    async function setAvatar() {
+      try {
+        const res = await fetch('/api/dashboard', { headers: { 'Authorization': 'Bearer ' + token } });
+        if (res.ok) {
+          const data = await res.json();
+          const initial = document.getElementById('avatarInitial');
+          if (initial && data.username) {
+            initial.textContent = data.username.charAt(0).toUpperCase();
+          }
+        }
+      } catch (_) {}
+    }
+
+    // ── Load ─────────────────────────────────────────────────────────────
+    loadInsights();
+
+    // ── Lucide icons ──────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 300);
+  </script>
+
+</body>
+</html>

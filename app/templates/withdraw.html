@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Withdraw – Nova Earns</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="stylesheet" href="/static/output.css" />
+  <script src="/static/lucide.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #09090B;
+      color: #FFFFFF;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    ::-webkit-scrollbar { width: 0; height: 0; }
+
+    /* ── Sticky Header ── */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(9, 9, 11, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(139, 92, 246, 0.10);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand { font-size: 18px; font-weight: 800; }
+    .gradient-text {
+      background: linear-gradient(135deg, #8B5CF6, #A855F7, #D946EF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #9CA3AF;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.2s;
+    }
+    .back-link:hover { color: #C4B5FD; background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.25); }
+
+    /* ── Page Body ── */
+    .page-body {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    /* ── Page Title ── */
+    .page-title { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 2px; }
+    .page-sub { color: #9CA3AF; font-size: 13px; margin-bottom: 28px; }
+
+    /* ── Step Progress Bar ── */
+    .step-bar {
+      display: flex;
+      align-items: center;
+      margin-bottom: 28px;
+      gap: 0;
+    }
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
+    .step-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      border: 2px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: #6B7280;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+    .step-circle.active {
+      border-color: #8B5CF6;
+      background: rgba(139,92,246,0.18);
+      color: #C4B5FD;
+      box-shadow: 0 0 0 4px rgba(139,92,246,0.12);
+    }
+    .step-circle.done {
+      border-color: #22C55E;
+      background: rgba(34,197,94,0.15);
+      color: #22C55E;
+    }
+    .step-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #6B7280;
+      margin-top: 5px;
+      text-align: center;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .step-item.active .step-label { color: #C4B5FD; }
+    .step-item.done .step-label   { color: #4ADE80; }
+
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: rgba(255,255,255,0.08);
+      margin: 0 -4px;
+      position: relative;
+      top: -14px;
+      z-index: 0;
+    }
+    .step-line.done { background: linear-gradient(90deg, #22C55E, #8B5CF6); }
+
+    /* ── Glass Card ── */
+    .card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+      animation: cardIn 0.22s ease;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Card Header ── */
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(168,85,247,0.2));
+      border: 1px solid rgba(139,92,246,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #C4B5FD;
+      flex-shrink: 0;
+    }
+    .card-title { font-size: 16px; font-weight: 700; color: #FFFFFF; }
+    .card-desc  { font-size: 13px; color: #9CA3AF; margin-top: 2px; line-height: 1.4; }
+
+    /* ── Form Fields ── */
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #9CA3AF;
+      margin-bottom: 6px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .field input[type="number"],
+    .field input[type="text"] {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(139,92,246,0.18);
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: #FFFFFF;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .field input:focus {
+      border-color: #8B5CF6;
+      background: rgba(139,92,246,0.07);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+    }
+    .field input::placeholder { color: #4B5563; }
+
+    /* ── Amount Input (bigger) ── */
+    .amount-wrap { position: relative; }
+    .amount-prefix {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      font-weight: 700;
+      color: #8B5CF6;
+      pointer-events: none;
+    }
+    .amount-wrap input {
+      padding-left: 30px !important;
+      font-size: 20px !important;
+      font-weight: 700 !important;
+      height: 54px;
+    }
+
+    /* ── Fee Payment Block ── */
+    .fee-header {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6B7280;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .fee-block {
+      background: rgba(139,92,246,0.06);
+      border: 1px solid rgba(139,92,246,0.18);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .fee-amount-banner {
+      padding: 16px 18px;
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(168,85,247,0.12));
+      border-bottom: 1px solid rgba(139,92,246,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .fee-amount-label { font-size: 12px; color: #9CA3AF; font-weight: 500; }
+    .fee-amount-value { font-size: 22px; font-weight: 800; color: #C4B5FD; }
+    .fee-rows { padding: 4px 0; }
+    .fee-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 13px;
+    }
+    .fee-row:last-child { border-bottom: none; }
+    .fee-row-label { color: #6B7280; font-weight: 500; }
+    .fee-row-value {
+      color: #E5E7EB;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .copy-btn {
+      background: rgba(139,92,246,0.12);
+      border: none;
+      border-radius: 6px;
+      padding: 3px 7px;
+      color: #A78BFA;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .copy-btn:hover { background: rgba(139,92,246,0.25); color: #C4B5FD; }
+
+    /* ── File Upload ── */
+    .file-upload-area {
+      border: 2px dashed rgba(139,92,246,0.25);
+      border-radius: 14px;
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+      background: rgba(139,92,246,0.03);
+      margin-bottom: 16px;
+    }
+    .file-upload-area:hover,
+    .file-upload-area.drag-over {
+      border-color: #8B5CF6;
+      background: rgba(139,92,246,0.08);
+    }
+    .file-upload-area input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .upload-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(139,92,246,0.12);
+      border: 1px solid rgba(139,92,246,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      color: #A78BFA;
+    }
+    .upload-title { font-size: 14px; font-weight: 600; color: #E5E7EB; margin-bottom: 3px; }
+    .upload-sub   { font-size: 12px; color: #6B7280; }
+    .upload-preview {
+      display: none;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #A78BFA;
+      font-weight: 500;
+    }
+    .upload-preview.show { display: block; }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      background: linear-gradient(135deg, #7C3AED, #8B5CF6, #A855F7);
+      color: #fff;
+      border: none;
+      padding: 13px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 4px 20px rgba(139,92,246,0.30);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(139,92,246,0.45);
+    }
+    .btn-primary:active:not(:disabled) { transform: scale(0.97); }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-loading::after {
+      content: '';
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-left: 4px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Messages ── */
+    .msg-error {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.20);
+      color: #F87171;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: none;
+      line-height: 1.5;
+    }
+    .msg-success {
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.20);
+      color: #4ADE80;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    /* ── Status Card ── */
+    .status-card-inner { padding: 8px 0 4px; }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .status-badge.pending  { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.2); color: #FCD34D; }
+    .status-badge.processing { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.2); color: #60A5FA; }
+    .status-badge.success  { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.2); color: #4ADE80; }
+    .status-badge.rejected { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2); color: #F87171; }
+    .status-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    .status-main-text { font-size: 16px; font-weight: 700; color: #FFFFFF; margin-bottom: 6px; }
+    .status-sub-text  { font-size: 13px; color: #9CA3AF; line-height: 1.5; }
+
+    .status-emoji { font-size: 44px; display: block; margin-bottom: 14px; }
+
+    .reject-reason {
+      margin-top: 14px;
+      background: rgba(239,68,68,0.07);
+      border: 1px solid rgba(239,68,68,0.15);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #FCA5A5;
+      line-height: 1.5;
+      display: none;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin: 18px 0;
+    }
+
+    /* ── Tip Box ── */
+    .tip-box {
+      background: rgba(139,92,246,0.06);
+      border: 1px solid rgba(139,92,246,0.14);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 12px;
+      color: #A78BFA;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .tip-box i { flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Copy Toast ── */
+    .copy-toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: rgba(34,197,94,0.92);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 480px) {
+      .page-body { padding: 18px 12px 50px; }
+      .card { padding: 18px 16px; border-radius: 16px; }
+      .page-title { font-size: 21px; }
+      .step-label { font-size: 9px; }
+      .fee-amount-value { font-size: 19px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Sticky Header ── -->
+  <header class="sticky-header">
+    <span class="brand gradient-text">Nova Earns</span>
+    <a href="/dashboard" class="back-link">
+      <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Dashboard
+    </a>
+  </header>
+
+  <div class="page-body">
+
+    <!-- Page Title -->
+    <h1 class="page-title">Withdraw <span class="gradient-text">Funds</span></h1>
+    <p class="page-sub">Request a withdrawal from your earnings</p>
+
+    <!-- Step Progress Bar -->
+    <div class="step-bar" id="stepBar">
+      <div class="step-item active" id="step1Item">
+        <div class="step-circle active" id="step1Circle">1</div>
+        <span class="step-label">Details</span>
+      </div>
+      <div class="step-line" id="line1"></div>
+      <div class="step-item" id="step2Item">
+        <div class="step-circle" id="step2Circle">2</div>
+        <span class="step-label">Pay Fee</span>
+      </div>
+      <div class="step-line" id="line2"></div>
+      <div class="step-item" id="step3Item">
+        <div class="step-circle" id="step3Circle">3</div>
+        <span class="step-label">Status</span>
+      </div>
+    </div>
+
+    <!-- ===== STEP 1: REQUEST FORM ===== -->
+    <section id="requestSection" style="display:none;">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i data-lucide="banknote" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="card-title">Withdrawal Amount</div>
+            <div class="card-desc">How much would you like to withdraw?</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="amountInput">Amount (₦)</label>
+          <div class="amount-wrap">
+            <span class="amount-prefix">₦</span>
+            <input type="number" id="amountInput" min="0.01" step="0.01" placeholder="0.00" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i data-lucide="building-2" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="card-title">Bank Details</div>
+            <div class="card-desc">Where should we send your funds?</div>
+          </div>
+        </div>
+
+        <form id="requestForm">
+          <div class="field">
+            <label for="bankNameInput">Bank Name</label>
+            <input type="text" id="bankNameInput" placeholder="e.g. GTBank" required>
+          </div>
+          <div class="field">
+            <label for="accountNumberInput">Account Number</label>
+            <input type="text" id="accountNumberInput" placeholder="0123456789" required>
+          </div>
+          <div class="field">
+            <label for="accountNameInput">Account Name</label>
+            <input type="text" id="accountNameInput" placeholder="Full name on account" required>
+          </div>
+
+          <div id="requestError" class="msg-error"></div>
+
+          <button type="submit" class="btn-primary" id="requestBtn">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            Submit Request
+          </button>
+        </form>
+      </div>
+
+    </section>
+
+    <!-- ===== STEP 2: PAY FEE & UPLOAD PROOF ===== -->
+    <section id="paymentSection" style="display:none;">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i data-lucide="credit-card" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="card-title">Pay Withdrawal Fee</div>
+            <div class="card-desc">
+              Transfer the fee to the account below for your withdrawal of
+              <strong id="withdrawAmountDisplay" style="color:#C4B5FD;"></strong>
+            </div>
+          </div>
+        </div>
+
+        <p class="fee-header">Fee Payment Details</p>
+        <div class="fee-block">
+          <div class="fee-amount-banner">
+            <span class="fee-amount-label">Fee to Pay</span>
+            <span class="fee-amount-value" id="feeAmountDisplay">—</span>
+          </div>
+          <div class="fee-rows">
+            <div class="fee-row">
+              <span class="fee-row-label">Bank</span>
+              <span class="fee-row-value" id="feeBankDisplay">—</span>
+            </div>
+            <div class="fee-row">
+              <span class="fee-row-label">Account Number</span>
+              <span class="fee-row-value">
+                <span id="feeAccountNumberDisplay">—</span>
+                <button class="copy-btn" onclick="copyField('feeAccountNumberDisplay')">Copy</button>
+              </span>
+            </div>
+            <div class="fee-row">
+              <span class="fee-row-label">Account Name</span>
+              <span class="fee-row-value" id="feeAccountNameDisplay">—</span>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="tip-box">
+          <i data-lucide="info" class="w-4 h-4"></i>
+          <span>After paying the fee, upload a screenshot of your payment receipt below. PNG or JPEG only, max 5 MB.</span>
+        </div>
+
+        <form id="proofForm">
+          <div class="file-upload-area" id="uploadArea">
+            <input type="file" id="proofFileInput" accept="image/png, image/jpeg" required>
+            <div class="upload-icon">
+              <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+            </div>
+            <div class="upload-title">Upload Payment Proof</div>
+            <div class="upload-sub">Click or drag a PNG / JPEG here</div>
+            <div class="upload-preview" id="uploadPreview"></div>
+          </div>
+
+          <div id="proofError" class="msg-error"></div>
+          <div id="proofSuccess" class="msg-success"></div>
+
+          <button type="submit" class="btn-primary" id="proofBtn">
+            <i data-lucide="upload" class="w-4 h-4"></i>
+            Submit Proof
+          </button>
+        </form>
+      </div>
+
+    </section>
+
+    <!-- ===== STEP 3: STATUS ===== -->
+    <section id="statusSection" style="display:none;">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i data-lucide="activity" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="card-title">Withdrawal Status</div>
+            <div class="card-desc">Track the progress of your request</div>
+          </div>
+        </div>
+
+        <div class="status-card-inner" style="text-align:center; padding: 10px 0 6px;">
+          <span class="status-emoji" id="statusEmoji">⏳</span>
+          <div id="statusBadgeWrap" style="display:flex; justify-content:center; margin-bottom:12px;"></div>
+          <p class="status-main-text" id="statusText"></p>
+          <p class="status-sub-text" id="statusSubText"></p>
+          <div class="reject-reason" id="statusRejectReason"></div>
+        </div>
+      </div>
+
+    </section>
+
+  </div><!-- /page-body -->
+
+  <!-- Copy Toast -->
+  <div id="copyToast" class="copy-toast">Copied!</div>
+
+  <script>
+    // ─────────────────────────────────────────────────────────────
+    //  ALL ORIGINAL LOGIC — PRESERVED EXACTLY
+    // ─────────────────────────────────────────────────────────────
+
+    const token = sessionStorage.getItem('access_token');
+    if (!token) window.location.href = '/login';
+
+    function authHeaders() {
+      return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+    }
+    function authHeadersNoContentType() {
+      return { 'Authorization': 'Bearer ' + token };
+    }
+
+    let currentWithdrawalId = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedId = urlParams.get('id');
+
+    function formatNaira(value) {
+      return `₦${Number(value || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    // ── Step bar UI ──
+    function setStep(n) {
+      const items   = ['step1Item','step2Item','step3Item'];
+      const circles = ['step1Circle','step2Circle','step3Circle'];
+      const lines   = ['line1','line2'];
+      const labels  = ['Details','Pay Fee','Status'];
+      const icons   = ['✓','✓','✓'];
+
+      items.forEach((id, i) => {
+        const el = document.getElementById(id);
+        const c  = document.getElementById(circles[i]);
+        el.classList.remove('active','done');
+        c.classList.remove('active','done');
+        if (i + 1 < n)      { el.classList.add('done'); c.classList.add('done'); c.textContent = '✓'; }
+        else if (i + 1 === n){ el.classList.add('active'); c.classList.add('active'); c.textContent = i + 1; }
+        else                 { c.textContent = i + 1; }
+      });
+      lines.forEach((id, i) => {
+        const el = document.getElementById(id);
+        el.classList.toggle('done', i + 1 < n);
+      });
+    }
+
+    function showSection(name) {
+      document.getElementById('requestSection').style.display = name === 'request' ? 'block' : 'none';
+      document.getElementById('paymentSection').style.display = name === 'payment' ? 'block' : 'none';
+      document.getElementById('statusSection').style.display  = name === 'status'  ? 'block' : 'none';
+      if (name === 'request') setStep(1);
+      if (name === 'payment') setStep(2);
+      if (name === 'status')  setStep(3);
+    }
+
+    async function loadFeeInfo() {
+      const res = await fetch('/api/dashboard/withdrawal/fee-info', { headers: authHeadersNoContentType() });
+      if (res.status === 401) { window.location.href = '/login'; return; }
+      const data = await res.json();
+      document.getElementById('feeAmountDisplay').textContent        = formatNaira(data.fee_amount);
+      document.getElementById('feeBankDisplay').textContent          = data.fee_bank_name;
+      document.getElementById('feeAccountNumberDisplay').textContent = data.fee_account_number;
+      document.getElementById('feeAccountNameDisplay').textContent   = data.fee_account_name;
+    }
+
+    // Status config (emoji, badge class, main text, sub text)
+    const STATUS_CONFIG = {
+      pending_verification: {
+        emoji: '📤', badge: 'pending', badgeLabel: 'Awaiting Verification',
+        main: 'Proof submitted — under review',
+        sub:  'Our team is reviewing your payment proof. This usually takes a short while.',
+      },
+      processing: {
+        emoji: '⚙️', badge: 'processing', badgeLabel: 'Processing',
+        main: 'Withdrawal is being processed',
+        sub:  'Your fee has been verified. We are processing your payout now.',
+      },
+      completed: {
+        emoji: '✅', badge: 'success', badgeLabel: 'Completed',
+        main: 'Withdrawal completed!',
+        sub:  'Your funds have been sent to your bank account.',
+      },
+      rejected: {
+        emoji: '❌', badge: 'rejected', badgeLabel: 'Rejected',
+        main: 'Withdrawal was rejected',
+        sub:  'Your proof of payment was not accepted. See the reason below.',
+      },
+    };
+
+    function renderForStatus(data) {
+      currentWithdrawalId = data.id;
+
+      if (data.status === 'pending_payment') {
+        document.getElementById('withdrawAmountDisplay').textContent = formatNaira(data.amount);
+        loadFeeInfo();
+        showSection('payment');
+        return;
+      }
+
+      // All other statuses → status section
+      const cfg = STATUS_CONFIG[data.status] || {
+        emoji: '⏳', badge: 'pending', badgeLabel: data.status,
+        main: data.status, sub: '',
+      };
+
+      document.getElementById('statusEmoji').textContent = cfg.emoji;
+      document.getElementById('statusText').textContent  = cfg.main;
+      document.getElementById('statusSubText').textContent = cfg.sub;
+
+      const badgeWrap = document.getElementById('statusBadgeWrap');
+      badgeWrap.innerHTML = `
+        <span class="status-badge ${cfg.badge}">
+          <span class="dot"></span>${cfg.badgeLabel}
+        </span>`;
+
+      const reasonEl = document.getElementById('statusRejectReason');
+      if (data.status === 'rejected' && data.admin_note) {
+        reasonEl.textContent = `Reason: ${data.admin_note}`;
+        reasonEl.style.display = 'block';
+      } else {
+        reasonEl.style.display = 'none';
+      }
+
+      showSection('status');
+    }
+
+    // ── Init ──
+    async function init() {
+      if (requestedId) {
+        try {
+          const res = await fetch(`/api/dashboard/withdrawal/${requestedId}`, {
+            headers: authHeadersNoContentType(),
+          });
+          if (res.status === 401) { window.location.href = '/login'; return; }
+          if (res.ok) { renderForStatus(await res.json()); return; }
+        } catch (_) {}
+      }
+
+      const res = await fetch('/api/dashboard/withdrawal/current', {
+        headers: authHeadersNoContentType(),
+      });
+      if (res.status === 401) { window.location.href = '/login'; return; }
+      const data = await res.json();
+
+      const activeStatuses = ['pending_payment', 'pending_verification', 'processing'];
+      if (data && activeStatuses.includes(data.status)) {
+        renderForStatus(data);
+      } else {
+        showSection('request');
+      }
+    }
+
+    // ── Request form ──
+    document.getElementById('requestForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('requestError');
+      const btn   = document.getElementById('requestBtn');
+      errEl.style.display = 'none';
+      btn.disabled = true;
+      btn.classList.add('btn-loading');
+
+      const payload = {
+        amount:         Number(document.getElementById('amountInput').value),
+        bank_name:      document.getElementById('bankNameInput').value.trim(),
+        account_number: document.getElementById('accountNumberInput').value.trim(),
+        account_name:   document.getElementById('accountNameInput').value.trim(),
+      };
+
+      const res  = await fetch('/api/dashboard/withdrawal', {
+        method: 'POST', headers: authHeaders(), body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      btn.disabled = false;
+      btn.classList.remove('btn-loading');
+
+      if (!res.ok) {
+        errEl.textContent    = data.detail || 'Unable to submit request.';
+        errEl.style.display  = 'block';
+        return;
+      }
+      renderForStatus(data);
+    });
+
+    // ── Proof upload form ──
+    document.getElementById('requestForm'); // already wired above
+    document.getElementById('proofForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('proofError');
+      const sucEl = document.getElementById('proofSuccess');
+      const btn   = document.getElementById('proofBtn');
+      errEl.style.display = 'none';
+      sucEl.style.display = 'none';
+
+      const fileInput = document.getElementById('proofFileInput');
+      if (!fileInput.files.length) {
+        errEl.textContent   = 'Please choose an image to upload.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.classList.add('btn-loading');
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      const res  = await fetch(`/api/dashboard/withdrawal/${currentWithdrawalId}/proof`, {
+        method: 'POST', headers: authHeadersNoContentType(), body: formData,
+      });
+      const data = await res.json();
+      btn.disabled = false;
+      btn.classList.remove('btn-loading');
+
+      if (!res.ok) {
+        errEl.textContent   = data.detail || 'Unable to upload proof.';
+        errEl.style.display = 'block';
+        return;
+      }
+      sucEl.textContent   = 'Proof of payment uploaded successfully.';
+      sucEl.style.display = 'block';
+      renderForStatus(data);
+    });
+
+    // ── File preview ──
+    document.getElementById('proofFileInput').addEventListener('change', function() {
+      const preview = document.getElementById('uploadPreview');
+      if (this.files.length) {
+        preview.textContent = `📎 ${this.files[0].name}`;
+        preview.classList.add('show');
+        document.querySelector('.upload-title').textContent = 'File selected';
+        document.querySelector('.upload-sub').textContent   = 'Click to change';
+      } else {
+        preview.classList.remove('show');
+        document.querySelector('.upload-title').textContent = 'Upload Payment Proof';
+        document.querySelector('.upload-sub').textContent   = 'Click or drag a PNG / JPEG here';
+      }
+    });
+
+    // ── Drag-over styling ──
+    const uploadArea = document.getElementById('uploadArea');
+    uploadArea.addEventListener('dragover',  () => uploadArea.classList.add('drag-over'));
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+    uploadArea.addEventListener('drop',      () => uploadArea.classList.remove('drag-over'));
+
+    // ── Copy helper ──
+    function copyField(id) {
+      const text = document.getElementById(id).textContent.trim();
+      navigator.clipboard.writeText(text).then(() => showToast());
+    }
+    function showToast() {
+      const t = document.getElementById('copyToast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // ── Boot ──
+    init();
+
+    // ── Lucide icons ──
+    document.addEventListener('DOMContentLoaded', () => { if (typeof lucide !== 'undefined') lucide.createIcons(); });
+    setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 100);
+    setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 500);
+  </script>
+
+</body>
+</html>

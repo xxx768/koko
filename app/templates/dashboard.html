@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>Dashboard – Nova Earns</title>
+      <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+
+    <link rel="stylesheet" href="/static/output.css" />
+    <script src="/static/lucide.js"></script>
+
+    <style>
+        /* ----- base reset & theme ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #09090B;
+            color: #FFFFFF;
+            min-height: 100vh;
+            padding-bottom: 88px;
+            /* space for fixed bottom nav */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* smooth scroll & tap highlight */
+        html {
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* glassmorphism base */
+        .glass {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.18);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+        }
+
+        .glass-nav {
+            background: rgba(9, 9, 11, 0.82);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(139, 92, 246, 0.12);
+            box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        /* gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #8B5CF6, #A855F7, #D946EF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* gradient buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #7C3AED, #8B5CF6, #A855F7);
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.30);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.45);
+        }
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+        .btn-primary:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s ease;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.13);
+            transform: translateY(-1px);
+        }
+        .btn-secondary:active {
+            transform: scale(0.96);
+        }
+
+        /* balance card gradient — simplified & smaller */
+        .balance-gradient {
+            background: linear-gradient(145deg, #1a0a2e 0%, #2d1b4e 40%, #4a2a7a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .balance-gradient::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -30%;
+            width: 80%;
+            height: 120%;
+            background: radial-gradient(ellipse, rgba(139, 92, 246, 0.25) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .balance-gradient::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 60%;
+            height: 100%;
+            background: radial-gradient(ellipse, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .balance-gradient>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* stat cards */
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.10);
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(139, 92, 246, 0.25);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        /* bottom nav items */
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 6px 0;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            color: #6B7280;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            min-height: 52px;
+            min-width: 52px;
+            position: relative;
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .nav-item:hover {
+            color: #C4B5FD;
+        }
+        .nav-item.active {
+            color: #8B5CF6;
+        }
+        .nav-item.active .nav-icon {
+            color: #8B5CF6;
+        }
+        .nav-item .nav-icon {
+            width: 22px;
+            height: 22px;
+            transition: all 0.2s ease;
+            color: currentColor;
+        }
+        .nav-item.active .nav-icon {
+            filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+        }
+
+        /* logout nav item */
+        .nav-item-logout {
+            color: #6B7280;
+        }
+        .nav-item-logout:hover {
+            color: #F87171;
+        }
+        .nav-item-logout.active {
+            color: #EF4444;
+        }
+        .nav-item-logout.active .nav-icon {
+            color: #EF4444;
+        }
+
+        /* loading skeleton pulse */
+        .skeleton-pulse {
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* fade-in */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* copy feedback */
+        .copy-toast {
+            transition: all 0.3s ease;
+        }
+
+        /* scrollbar hide */
+        ::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+
+        /* tap targets */
+        .tap-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        /* max-width container */
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* sticky header */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(9, 9, 11, 0.78);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.08);
+        }
+
+        /* fixed bottom nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            height: 72px;
+            background: rgba(9, 9, 11, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(139, 92, 246, 0.10);
+            box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: stretch;
+            justify-content: space-around;
+            padding: 4px 6px 8px;
+            max-width: 480px;
+            margin: 0 auto;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+        }
+        @media (min-width: 480px) {
+            .bottom-nav {
+                padding: 4px 12px 8px;
+            }
+        }
+
+        /* avatar shimmer */
+        .avatar-ring {
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25), 0 0 20px rgba(139, 92, 246, 0.10);
+        }
+
+        /* badge */
+        .badge-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: #EF4444;
+            border-radius: 50%;
+            border: 2px solid #09090B;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+        }
+
+        /* icon container */
+        .icon-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(139, 92, 246, 0.10);
+            color: #8B5CF6;
+            flex-shrink: 0;
+        }
+        .icon-wrap-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+        }
+
+        /* card inner spacing */
+        .card-pad {
+            padding: 18px 20px;
+        }
+
+        /* status colors */
+        .status-pending {
+            color: #FACC15;
+        }
+        .status-processing {
+            color: #60A5FA;
+        }
+        .status-completed {
+            color: #22C55E;
+        }
+        .status-rejected {
+            color: #EF4444;
+        }
+        .status-verification {
+            color: #A78BFA;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ====== STICKY HEADER ====== -->
+    <header class="sticky-header app-container w-full py-3 flex items-center justify-between">
+        <!-- left: greeting + username -->
+        <div class="flex items-center gap-2 min-w-0">
+            <span class="text-sm font-medium text-[#9CA3AF] tracking-wide">Hello,</span>
+            <span id="username" class="text-sm font-semibold text-white truncate max-w-[120px] sm:max-w-[160px]">User</span>
+        </div>
+
+        <!-- right: notification bell + avatar -->
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <!-- notification bell with badge -->
+            <a href="/notifications-page" class="relative tap-target flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors" aria-label="Notifications">
+                <i data-lucide="bell" class="w-5 h-5"></i>
+                <span id="unread" class="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[9px] font-bold leading-none bg-[#EF4444] text-white rounded-full shadow-lg shadow-red-500/30" style="display:none">
+                    0
+                </span>
+            </a>
+
+            <!-- profile avatar -->
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white font-semibold text-sm avatar-ring flex-shrink-0">
+                <span id="avatarInitial" class="uppercase">U</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ====== MAIN CONTENT ====== -->
+    <main class="app-container w-full pt-4 pb-6">
+
+        <!-- loading message (hidden after load) -->
+        <div id="loadingMsg" class="flex flex-col items-center justify-center py-12 gap-3">
+            <div class="w-10 h-10 rounded-full border-3 border-[#8B5CF6]/30 border-t-[#8B5CF6] animate-spin"></div>
+            <p class="text-[#9CA3AF] text-sm font-medium">Loading your dashboard…</p>
+        </div>
+
+        <!-- main content wrapper (hidden initially) -->
+        <div id="content" style="display:none;" class="fade-in space-y-4">
+
+            <!-- ====== BALANCE CARD — simplified, no icon, smaller ====== -->
+            <section class="balance-gradient rounded-2xl px-5 py-4 shadow-2xl shadow-purple-500/10 border border-purple-500/15 relative overflow-hidden">
+                <div class="relative z-10 flex items-center justify-between">
+                    <div>
+                        <p class="text-[#9CA3AF] text-[10px] font-medium uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="wallet" class="w-3 h-3"></i>
+                            Total Balance
+                        </p>
+                        <p id="balance" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-0.5">
+                            ₦0.00
+                        </p>
+                    </div>
+                    <a href="/withdraw" class="btn-primary text-white text-xs font-semibold px-4 py-2 rounded-xl tracking-wide shadow-lg shadow-purple-500/25 inline-flex items-center gap-1.5 tap-target">
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        Withdraw
+                    </a>
+                </div>
+            </section>
+
+            <!-- ====== QUICK STATS (3 cards) ====== -->
+            <div class="grid grid-cols-3 gap-2.5">
+                <!-- Notifications -->
+                <div class="stat-card rounded-xl card-pad text-center flex flex-col items-center">
+                    <div class="icon-wrap icon-wrap-sm bg-[#8B5CF6]/10 text-[#8B5CF6] mb-1.5">
+                        <i data-lucide="bell" class="w-4 h-4"></i>
+                    </div>
+                    <p class="text-[#9CA3AF] text-[10px] font-medium uppercase tracking-wider">Alerts</p>
+                    <p id="unreadStat" class="text-sm font-bold text-white mt-0.5">0</p>
+                </div>
+
+                <!-- Bonus -->
+                <div class="stat-card rounded-xl card-pad text-center flex flex-col items-center">
+                    <div class="icon-wrap icon-wrap-sm bg-[#A855F7]/10 text-[#A855F7] mb-1.5">
+                        <i data-lucide="gift" class="w-4 h-4"></i>
+                    </div>
+                    <p class="text-[#9CA3AF] text-[10px] font-medium uppercase tracking-wider">Bonus</p>
+                    <p id="bonusStatusShort" class="text-sm font-bold text-white mt-0.5 truncate max-w-[60px]">—</p>
+                </div>
+
+                <!-- Referrals -->
+                <div class="stat-card rounded-xl card-pad text-center flex flex-col items-center">
+                    <div class="icon-wrap icon-wrap-sm bg-[#D946EF]/10 text-[#D946EF] mb-1.5">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                    </div>
+                    <p class="text-[#9CA3AF] text-[10px] font-medium uppercase tracking-wider">Referrals</p>
+                    <p id="referralCountShort" class="text-sm font-bold text-white mt-0.5">0</p>
+                </div>
+            </div>
+
+            <!-- ====== DAILY BONUS CARD ====== -->
+            <section id="bonusBox" class="glass-card rounded-2xl card-pad space-y-3 transition-all">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="icon-wrap bg-[#A855F7]/15 text-[#A855F7]">
+                            <i data-lucide="gift" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-white">Daily Bonus</p>
+                            <p id="bonusStatus" class="text-xs text-[#9CA3AF] font-medium">Loading…</p>
+                        </div>
+                    </div>
+                    <button id="claimBonusBtn" type="button" class="btn-primary text-white text-xs font-semibold px-5 py-2.5 rounded-xl tap-target disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none shadow-lg shadow-purple-500/25">
+                        Claim
+                    </button>
+                </div>
+                <div id="bonusError" style="display:none;" class="text-xs text-[#EF4444] bg-red-500/10 rounded-xl px-3 py-2 border border-red-500/20"></div>
+                <div id="bonusSuccess" style="display:none;" class="text-xs text-[#22C55E] bg-green-500/10 rounded-xl px-3 py-2 border border-green-500/20"></div>
+            </section>
+
+            <!-- ====== WITHDRAWAL CARD ====== -->
+            <section id="withdrawalBox" class="glass-card rounded-2xl card-pad space-y-3 transition-all">
+                <div class="flex items-center gap-3">
+                    <div class="icon-wrap bg-[#8B5CF6]/15 text-[#8B5CF6]">
+                        <i data-lucide="credit-card" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-white">Withdrawal</p>
+                        <p id="withdrawalStatus" class="text-xs text-[#9CA3AF] font-medium truncate">Loading…</p>
+                    </div>
+                    <a id="withdrawLink" href="/withdraw" class="btn-secondary text-white text-xs font-semibold px-4 py-2 rounded-xl tap-target inline-flex items-center gap-1.5 whitespace-nowrap">
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        <span>Request</span>
+                    </a>
+                </div>
+                <div id="withdrawalRejectReason" style="display:none;" class="text-xs text-[#EF4444] bg-red-500/10 rounded-xl px-3 py-2 border border-red-500/20"></div>
+            </section>
+
+            <!-- ====== REFERRAL CARD ====== -->
+            <section id="referralBox" class="glass-card rounded-2xl card-pad space-y-3 transition-all">
+                <div class="flex items-center gap-3">
+                    <div class="icon-wrap bg-[#D946EF]/15 text-[#D946EF]">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-white">Referral</p>
+                        <p id="referralLoading" class="text-xs text-[#9CA3AF] font-medium">Loading…</p>
+                    </div>
+                </div>
+
+                <!-- referral content (hidden initially) -->
+                <div id="referralContent" style="display:none;" class="space-y-3 pt-1">
+                    <p class="text-xs text-[#9CA3AF] leading-relaxed">Share your link and earn a bonus when your referral completes their first withdrawal.</p>
+
+                    <!-- referral code -->
+                    <div class="flex items-center gap-2 bg-white/5 rounded-xl px-3 py-2 border border-white/5">
+                        <span class="text-xs font-medium text-[#9CA3AF]">Code</span>
+                        <span id="referralCode" class="text-sm font-bold text-white flex-1 truncate">———</span>
+                        <button id="copyCodeBtn" type="button" class="btn-secondary text-[#A855F7] text-xs font-semibold px-3 py-1.5 rounded-lg tap-target flex items-center gap-1.5">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            Copy
+                        </button>
+                    </div>
+
+                    <!-- referral link -->
+                    <div class="flex items-center gap-2 bg-white/5 rounded-xl px-3 py-2 border border-white/5">
+                        <span class="text-xs font-medium text-[#9CA3AF]">Link</span>
+                        <span id="referralLink" class="text-xs text-[#C4B5FD] flex-1 truncate font-mono">———</span>
+                        <button id="copyLinkBtn" type="button" class="btn-secondary text-[#A855F7] text-xs font-semibold px-3 py-1.5 rounded-lg tap-target flex items-center gap-1.5">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            Copy
+                        </button>
+                    </div>
+
+                    <!-- copy feedback -->
+                    <div id="copyMsg" style="display:none;" class="text-xs text-[#22C55E] bg-green-500/10 rounded-xl px-3 py-2 border border-green-500/20 text-center">
+                        <i data-lucide="check" class="w-3.5 h-3.5 inline mr-1"></i>
+                        Copied!
+                    </div>
+
+                    <!-- stats -->
+                    <div id="referralStats" class="text-xs text-[#9CA3AF] bg-white/5 rounded-xl px-3 py-2.5 border border-white/5 leading-relaxed">
+                        Loading stats…
+                    </div>
+                </div>
+            </section>
+
+            <!-- hidden error message -->
+            <div id="errorMsg" style="display:none;" class="text-sm text-[#EF4444] bg-red-500/10 rounded-xl px-4 py-3 border border-red-500/20 text-center">
+                <i data-lucide="alert-circle" class="w-4 h-4 inline mr-1.5"></i>
+                <span></span>
+            </div>
+
+        </div>
+        <!-- end #content -->
+
+    </main>
+
+    <!-- ====== FIXED BOTTOM NAVIGATION ====== -->
+    <nav class="bottom-nav" aria-label="Main navigation">
+
+        <!-- Home -->
+        <a href="#" class="nav-item active" aria-label="Home">
+            <i data-lucide="house" class="nav-icon"></i>
+            <span>Home</span>
+        </a>
+
+        <!-- Surveys -->
+        <a href="/survey-user" class="nav-item" aria-label="Surveys">
+            <i data-lucide="clipboard-list" class="nav-icon"></i>
+            <span>Surveys</span>
+        </a>
+
+        <!-- Insights -->
+        <a href="/insights" class="nav-item" aria-label="Insights">
+            <i data-lucide="bar-chart-3" class="nav-icon"></i>
+            <span>Insights</span>
+        </a>
+
+        <!-- Notifications -->
+        <a href="/notifications-page" class="nav-item" aria-label="Notifications">
+            <i data-lucide="bell" class="nav-icon"></i>
+            <span>Alerts</span>
+        </a>
+
+        <!-- Logout (preserves logoutBtn ID) -->
+        <a href="#" id="logoutBtn" class="nav-item nav-item-logout" aria-label="Logout">
+            <i data-lucide="log-out" class="nav-icon"></i>
+            <span>Logout</span>
+        </a>
+
+    </nav>
+
+
+    <!-- ====== JAVASCRIPT (100% preserved) ====== -->
+    <script>
+        // ---- preserve all original logic ----
+        const token = sessionStorage.getItem('access_token');
+        if (!token) window.location.href = '/login';
+
+        async function loadDashboard() {
+            try {
+                const res = await fetch('/api/dashboard', {
+                    headers: { 'Authorization': 'Bearer ' + token },
+                });
+                if (res.status === 401) { window.location.href = '/login'; return; }
+                const data = await res.json();
+                if (data.role === 'admin') {
+                    window.location.href = '/admin-dashboard';
+                    return;
+                }
+                document.getElementById('username').textContent = data.username;
+                document.getElementById('balance').textContent = data.balance;
+                const unreadCount = Number(data.unread_notifications) || 0;
+                const unreadBadge = document.getElementById('unread');
+                unreadBadge.textContent = unreadCount;
+                unreadBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+
+                const bonus = data.daily_bonus || {};
+                const bonusText = bonus.can_claim ?
+                    `Available now: ₦${Number(bonus.bonus_amount || 0).toFixed(2)}` :
+                    `Next bonus available: ${bonus.next_claim_at ? new Date(bonus.next_claim_at).toLocaleString() : 'soon'}`;
+                document.getElementById('bonusStatus').textContent = bonusText;
+                // update short bonus stat
+                const bonusShort = document.getElementById('bonusStatusShort');
+                if (bonusShort) {
+                    bonusShort.textContent = bonus.can_claim ? 'Claim' : 'Soon';
+                }
+                document.getElementById('claimBonusBtn').disabled = !bonus.can_claim;
+                document.getElementById('loadingMsg').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+                // update avatar initial
+                const initial = document.getElementById('avatarInitial');
+                if (initial && data.username) {
+                    initial.textContent = data.username.charAt(0).toUpperCase();
+                }
+
+                // update referral count short
+                try {
+                    const refRes = await fetch('/referral/stats', {
+                        headers: { 'Authorization': 'Bearer ' + token },
+                    });
+                    if (refRes.ok) {
+                        const refData = await refRes.json();
+                        const refCount = document.getElementById('referralCountShort');
+                        if (refCount) refCount.textContent = refData.total_referrals || 0;
+                    }
+                } catch (_) { /* ignore */ }
+
+            } catch (err) {
+                document.getElementById('errorMsg').textContent = 'Failed to load dashboard.';
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+
+        document.getElementById('claimBonusBtn').addEventListener('click', async function() {
+            const errorEl = document.getElementById('bonusError');
+            const successEl = document.getElementById('bonusSuccess');
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+            try {
+                const res = await fetch('/api/dashboard/bonus/claim', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                });
+                const data = await res.json();
+                if (!res.ok) { errorEl.textContent = data.detail || 'Unable to claim bonus.';
+                    errorEl.style.display = 'block'; return; }
+                successEl.textContent = `Bonus claimed successfully! Added ₦${Number(data.bonus_amount || 0).toFixed(2)}.`;
+                successEl.style.display = 'block';
+                await loadDashboard();
+            } catch (err) {
+                errorEl.textContent = 'Unable to claim bonus.';
+                errorEl.style.display = 'block';
+            }
+        });
+
+        async function loadWithdrawalStatus() {
+            const statusEl = document.getElementById('withdrawalStatus');
+            const reasonEl = document.getElementById('withdrawalRejectReason');
+            const linkEl = document.getElementById('withdrawLink');
+            reasonEl.style.display = 'none';
+            try {
+                const res = await fetch('/api/dashboard/withdrawal/current', {
+                    headers: { 'Authorization': 'Bearer ' + token },
+                });
+                if (res.status === 401) { window.location.href = '/login'; return; }
+                const data = await res.json();
+
+                if (!data) {
+                    statusEl.textContent = 'No withdrawal requests yet.';
+                    linkEl.style.display = 'inline-flex';
+                    linkEl.innerHTML =
+                        '<i data-lucide="arrow-right" class="w-3.5 h-3.5"></i><span>Request</span>';
+                    linkEl.href = '/withdraw';
+                    // re-init lucide for this element
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    return;
+                }
+
+                const labels = {
+                    pending_payment: `Pending payment: pay the withdrawal fee and upload proof to continue.`,
+                    pending_verification: 'Pending verification: your proof of payment is under review.',
+                    processing: 'Withdrawal processing.',
+                    completed: 'Withdrawal completed.',
+                    rejected: 'Withdrawal rejected.',
+                };
+                statusEl.textContent = `${labels[data.status] || data.status} (Amount: ₦${Number(data.amount).toFixed(2)})`;
+
+                if (data.status === 'rejected' && data.admin_note) {
+                    reasonEl.textContent = `Reason: ${data.admin_note}`;
+                    reasonEl.style.display = 'block';
+                }
+
+                const activeStatuses = ['pending_payment', 'pending_verification', 'processing'];
+                if (data.status === 'pending_payment') {
+                    linkEl.innerHTML =
+                        '<i data-lucide="arrow-right" class="w-3.5 h-3.5"></i><span>Continue</span>';
+                    linkEl.href = `/withdraw?id=${data.id}`;
+                    linkEl.style.display = 'inline-flex';
+                } else if (activeStatuses.includes(data.status)) {
+                    linkEl.style.display = 'none';
+                } else {
+                    linkEl.innerHTML =
+                        '<i data-lucide="arrow-right" class="w-3.5 h-3.5"></i><span>Request</span>';
+                    linkEl.href = '/withdraw';
+                    linkEl.style.display = 'inline-flex';
+                }
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            } catch (err) {
+                statusEl.textContent = 'Failed to load withdrawal status.';
+            }
+        }
+
+        async function loadReferralStats() {
+            const loadingEl = document.getElementById('referralLoading');
+            const contentEl = document.getElementById('referralContent');
+            try {
+                const res = await fetch('/referral/stats', {
+                    headers: { 'Authorization': 'Bearer ' + token },
+                });
+                if (!res.ok) { loadingEl.textContent = 'Could not load referral info.'; return; }
+                const data = await res.json();
+
+                const code = data.referral_code;
+                const link = `${window.location.origin}/signup?ref=${code}`;
+
+                document.getElementById('referralCode').textContent = code;
+                document.getElementById('referralLink').textContent = link;
+                document.getElementById('referralStats').textContent =
+                    `Referrals: ${data.total_referrals} total — ${data.paid_referrals} rewarded, ${data.pending_referrals} pending. Total earned: ₦${Number(data.total_earned).toFixed(2)}`;
+
+                // update referral count short if not already set
+                const refCount = document.getElementById('referralCountShort');
+                if (refCount) refCount.textContent = data.total_referrals || 0;
+
+                loadingEl.style.display = 'none';
+                contentEl.style.display = 'block';
+
+                function showCopied() {
+                    const msg = document.getElementById('copyMsg');
+                    msg.style.display = 'block';
+                    setTimeout(() => msg.style.display = 'none', 1500);
+                }
+
+                document.getElementById('copyCodeBtn').addEventListener('click', function() {
+                    navigator.clipboard.writeText(code).then(showCopied);
+                });
+
+                document.getElementById('copyLinkBtn').addEventListener('click', function() {
+                    navigator.clipboard.writeText(link).then(showCopied);
+                });
+
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            } catch (err) {
+                loadingEl.textContent = 'Could not load referral info.';
+            }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            e.preventDefault();
+            const refresh = sessionStorage.getItem('refresh_token');
+            await fetch('/auth/logout', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh_token: refresh }),
+            });
+            sessionStorage.clear();
+            window.location.href = '/login';
+        });
+
+        // ---- load everything ----
+        loadDashboard();
+        loadWithdrawalStatus();
+        loadReferralStats();
+
+        // ---- lucide icons ----
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+        // also run after any dynamic content updates
+        setTimeout(() => {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }, 300);
+    </script>
+
+</body>
+</html>

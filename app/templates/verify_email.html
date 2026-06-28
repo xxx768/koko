@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Verify Email – Nova Earns</title>
+        <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+
+    <link rel="stylesheet" href="/static/output.css" />
+    <script src="/static/lucide.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #09090B;
+      color: #FFFFFF;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #8B5CF6, #A855F7, #D946EF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7C3AED, #8B5CF6, #A855F7);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.30);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.45);
+    }
+    .btn-primary:active {
+      transform: scale(0.96);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s ease;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+    .btn-secondary:active {
+      transform: scale(0.96);
+    }
+
+    .auth-input {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(139, 92, 246, 0.20);
+      border-radius: 12px;
+      padding: 12px 16px;
+      width: 100%;
+      color: #FFFFFF;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    .auth-input:focus {
+      border-color: #8B5CF6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.20);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .auth-input::placeholder {
+      color: #6B7280;
+    }
+    .auth-input:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 1000px #1a1a2e inset !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+    }
+
+    .auth-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #D1D5DB;
+      margin-bottom: 6px;
+    }
+
+    .auth-link {
+      color: #A855F7;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .auth-link:hover {
+      color: #C4B5FD;
+      text-decoration: underline;
+    }
+
+    .msg-error {
+      background: rgba(239, 68, 68, 0.10);
+      border: 1px solid rgba(239, 68, 68, 0.20);
+      color: #EF4444;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+    .msg-success {
+      background: rgba(34, 197, 94, 0.10);
+      border: 1px solid rgba(34, 197, 94, 0.20);
+      color: #22C55E;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+
+    .auth-container {
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
+    .stat-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9CA3AF;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: #6B7280;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .tap-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* code input - make it look like an OTP */
+    .code-input {
+      letter-spacing: 4px;
+      font-size: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <div class="glass-card rounded-2xl p-6 md:p-8">
+
+      <!-- Branding & Tagline -->
+      <div class="text-center">
+        <div class="mx-auto mb-3 w-16 h-16 rounded-full overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+                    <img src="/static/nova.svg" alt="nova earns logo" />
+
+        </div>
+        <h1 class="text-3xl font-extrabold gradient-text tracking-tight">Nova Earns</h1>
+        <p class="text-[#9CA3AF] text-sm font-medium mt-1">Nigeria's #1 Online Earning Platform</p>
+        <p class="text-[#6B7280] text-xs mt-0.5">Earn · Grow · Win</p>
+      </div>
+
+      <!-- Trust Stats -->
+      <div class="grid grid-cols-3 gap-2 py-4 my-4 border-y border-white/5">
+        <div class="stat-item">
+          <p class="stat-value">147,637+</p>
+          <p class="stat-label">Active Users</p>
+        </div>
+        <div class="stat-item">
+          <p class="stat-value">₦2.4B+</p>
+          <p class="stat-label">Total Paid Out</p>
+        </div>
+        <div class="stat-item">
+          <p class="stat-value">100%</p>
+          <p class="stat-label">Satisfaction</p>
+        </div>
+      </div>
+
+      <!-- Heading -->
+      <h2 class="text-xl font-bold text-white text-center">Verify Your Email</h2>
+      <p class="text-sm text-[#9CA3AF] text-center mt-1">Enter the 5‑digit code sent to your email.</p>
+
+      <!-- Verification Form (PRESERVED ID: verifyForm) -->
+      <form id="verifyForm" class="space-y-4 mt-4">
+
+        <!-- Email -->
+        <div>
+          <label for="email" class="auth-label">Email</label>
+          <div class="relative">
+            <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none"></i>
+            <input type="email" id="email" name="email" required class="auth-input pl-10" placeholder="you@example.com">
+          </div>
+        </div>
+
+        <!-- Verification Code -->
+        <div>
+          <label for="code" class="auth-label">Verification Code</label>
+          <div class="relative">
+            <i data-lucide="key" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none"></i>
+            <input type="text" id="code" name="code" required minlength="5" maxlength="5"
+                   pattern="\d{5}" inputmode="numeric" placeholder="12345"
+                   class="auth-input pl-10 code-input" autocomplete="one-time-code">
+          </div>
+        </div>
+
+        <!-- Error & Success Messages (PRESERVED IDs) -->
+        <div id="errorMsg" class="msg-error" style="display:none;"></div>
+        <div id="successMsg" class="msg-success" style="display:none;"></div>
+
+        <!-- Buttons: Verify & Resend -->
+        <div class="flex flex-col gap-3">
+          <button type="submit" class="btn-primary w-full text-white font-semibold py-3 rounded-xl transition-all tap-target flex items-center justify-center gap-2">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            Verify
+          </button>
+          <button type="button" id="resendBtn" class="btn-secondary w-full text-white font-semibold py-3 rounded-xl transition-all tap-target flex items-center justify-center gap-2">
+            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+            Resend Code
+          </button>
+        </div>
+      </form>
+
+      <!-- Back to Login -->
+      <p class="text-center text-sm text-[#9CA3AF] mt-5">
+        <a href="/login" class="auth-link">Back to Login</a>
+      </p>
+
+    </div>
+  </div>
+
+  <script>
+    // ----- PRESERVED ORIGINAL VERIFICATION LOGIC (DO NOT MODIFY) -----
+    // Pre-fill email if coming from registration
+    const pendingEmail = sessionStorage.getItem('pending_email');
+    if (pendingEmail) document.getElementById('email').value = pendingEmail;
+
+    const errorEl = document.getElementById('errorMsg');
+    const successEl = document.getElementById('successMsg');
+
+    document.getElementById('verifyForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+
+      const payload = {
+        email: document.getElementById('email').value.trim(),
+        code: document.getElementById('code').value.trim(),
+      };
+
+      try {
+        const res = await fetch('/auth/verify-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errorEl.textContent = data.detail || 'Verification failed.';
+          errorEl.style.display = 'block';
+          return;
+        }
+        sessionStorage.removeItem('pending_email');
+        successEl.textContent = data.message + ' Redirecting to login...';
+        successEl.style.display = 'block';
+        setTimeout(() => window.location.href = '/login', 2000);
+      } catch (err) {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.style.display = 'block';
+      }
+    });
+
+    document.getElementById('resendBtn').addEventListener('click', async function() {
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+      const email = document.getElementById('email').value.trim();
+      if (!email) { errorEl.textContent = 'Enter your email first.'; errorEl.style.display = 'block'; return; }
+
+      try {
+        const res = await fetch('/auth/resend-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+        if (!res.ok) { errorEl.textContent = data.detail; errorEl.style.display = 'block'; return; }
+        successEl.textContent = data.message;
+        successEl.style.display = 'block';
+      } catch (err) {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // ----- LUCIDE ICONS -----
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 300);
+  </script>
+
+</body>
+</html>

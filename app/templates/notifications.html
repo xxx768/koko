@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Notifications – Nova Earns</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+
+  <link rel="stylesheet" href="/static/output.css" />
+  <script src="/static/lucide.js"></script>
+
+  <style>
+    /* ----- base reset & theme (matches dashboard) ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #09090B;
+      color: #FFFFFF;
+      min-height: 100vh;
+      padding-bottom: 88px; /* space for fixed bottom nav */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* glassmorphism */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    }
+    .glass-card-light {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(139, 92, 246, 0.10);
+    }
+
+    /* sticky header */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(9, 9, 11, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(139, 92, 246, 0.08);
+    }
+
+    /* max-width container */
+    .app-container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* avatar ring */
+    .avatar-ring {
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25), 0 0 20px rgba(139, 92, 246, 0.10);
+    }
+
+    /* tap targets */
+    .tap-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* bottom nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      height: 72px;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(139, 92, 246, 0.10);
+      box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: stretch;
+      justify-content: space-around;
+      padding: 4px 6px 8px;
+      max-width: 480px;
+      margin: 0 auto;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+    }
+    @media (min-width: 480px) {
+      .bottom-nav {
+        padding: 4px 12px 8px;
+      }
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 6px 0;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      color: #6B7280;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      min-height: 52px;
+      min-width: 52px;
+      position: relative;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-item:hover {
+      color: #C4B5FD;
+    }
+    .nav-item.active {
+      color: #8B5CF6;
+    }
+    .nav-item.active .nav-icon {
+      color: #8B5CF6;
+    }
+    .nav-item .nav-icon {
+      width: 22px;
+      height: 22px;
+      transition: all 0.2s ease;
+      color: currentColor;
+    }
+    .nav-item.active .nav-icon {
+      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+    }
+    .nav-item-logout {
+      color: #6B7280;
+    }
+    .nav-item-logout:hover {
+      color: #F87171;
+    }
+    .nav-item-logout.active {
+      color: #EF4444;
+    }
+    .nav-item-logout.active .nav-icon {
+      color: #EF4444;
+    }
+
+    /* notification specific styles */
+    .notif-card {
+      transition: all 0.2s ease;
+    }
+    .notif-card:hover {
+      border-color: rgba(139, 92, 246, 0.4);
+      transform: translateY(-1px);
+    }
+    .notif-unread {
+      border-left: 3px solid #8B5CF6;
+      background: rgba(139, 92, 246, 0.06);
+    }
+    .notif-read {
+      opacity: 0.6;
+    }
+    .notif-read .notif-title {
+      color: #9CA3AF;
+    }
+    .notif-title {
+      color: #FFFFFF;
+    }
+    .announcement-card {
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      background: rgba(139, 92, 246, 0.08);
+    }
+    .announcement-card .notif-title {
+      color: #C4B5FD;
+    }
+
+    .mark-read-btn {
+      background: rgba(139, 92, 246, 0.15);
+      color: #C4B5FD;
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      transition: all 0.2s ease;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .mark-read-btn:hover {
+      background: rgba(139, 92, 246, 0.25);
+      transform: scale(1.02);
+    }
+    .mark-read-btn:active {
+      transform: scale(0.95);
+    }
+
+    .badge-unread {
+      background: #EF4444;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-left: 8px;
+    }
+
+    /* fade-in */
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* scrollbar hide */
+    ::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== STICKY HEADER ====== -->
+  <header class="sticky-header app-container w-full py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3 min-w-0">
+      <a href="/dashboard" class="tap-target flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors" aria-label="Back to Dashboard">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </a>
+      <h1 class="text-base font-semibold text-white truncate">Notifications</h1>
+    </div>
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white font-semibold text-xs avatar-ring">
+        <span id="avatarInitial" class="uppercase">U</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====== MAIN CONTENT ====== -->
+  <main class="app-container w-full pt-4 pb-6">
+
+    <!-- Unread count + header -->
+    <div class="flex items-center justify-between mb-4">
+      <p class="text-[#9CA3AF] text-sm font-medium">
+        Unread: <strong id="unreadCount" class="text-white">—</strong>
+      </p>
+      <!-- optional refresh? not in original -->
+    </div>
+
+    <!-- Notifications list container -->
+    <div id="notificationsList" class="space-y-3">
+      <!-- will be populated by JS -->
+    </div>
+
+  </main>
+
+  <!-- ====== FIXED BOTTOM NAVIGATION ====== -->
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <!-- Home -->
+    <a href="/dashboard" class="nav-item" aria-label="Home">
+      <i data-lucide="house" class="nav-icon"></i>
+      <span>Home</span>
+    </a>
+    <!-- Surveys -->
+    <a href="/survey-user" class="nav-item" aria-label="Surveys">
+      <i data-lucide="clipboard-list" class="nav-icon"></i>
+      <span>Surveys</span>
+    </a>
+    <!-- Insights -->
+    <a href="/insights" class="nav-item" aria-label="Insights">
+      <i data-lucide="bar-chart-3" class="nav-icon"></i>
+      <span>Insights</span>
+    </a>
+    <!-- Notifications (active) -->
+    <a href="/notifications-page" class="nav-item active" aria-label="Notifications">
+      <i data-lucide="bell" class="nav-icon"></i>
+      <span class="relative flex items-center gap-1">
+        Alerts
+        <span id="alertBadge" class="badge-unread hidden">0</span>
+      </span>
+    </a>
+    <!-- Logout (preserves logoutBtn ID) -->
+    <a href="#" id="logoutBtn" class="nav-item nav-item-logout" aria-label="Logout">
+      <i data-lucide="log-out" class="nav-icon"></i>
+      <span>Logout</span>
+    </a>
+  </nav>
+
+  <!-- ====== JAVASCRIPT (100% preserved, only UI classes added) ====== -->
+  <script>
+    const token = sessionStorage.getItem('access_token');
+    if (!token) window.location.href = '/login';
+
+    async function loadNotifications({ markAllReadOnOpen = false } = {}) {
+      const res = await fetch('/notifications', {
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      if (res.status === 401) { window.location.href = '/login'; return; }
+      const data = await res.json();
+      console.log('API response:', JSON.stringify(data));
+
+      const personalUnread = Number(data.unread_count || 0);
+
+      document.getElementById('unreadCount').textContent = personalUnread;
+
+      const alertBadge = document.getElementById('alertBadge');
+      if (alertBadge) {
+        if (personalUnread > 0) {
+          alertBadge.textContent = personalUnread;
+          alertBadge.classList.remove('hidden');
+        } else {
+          alertBadge.textContent = '0';
+          alertBadge.classList.add('hidden');
+        }
+      }
+
+      let html = '';
+
+      // Announcements pinned at top
+      if (data.announcements && data.announcements.length) {
+        for (const a of data.announcements) {
+          html += `<div class="glass-card announcement-card rounded-2xl p-4 notif-card">
+            <div class="flex items-start gap-2">
+              <i data-lucide="megaphone" class="w-5 h-5 text-[#A855F7] flex-shrink-0 mt-0.5"></i>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <strong class="notif-title text-[#C4B5FD]">${escHtml(a.title)}</strong>
+                  <span class="text-[10px] bg-[#8B5CF6]/20 text-[#C4B5FD] px-2 py-0.5 rounded-full">Announcement</span>
+                </div>
+                <p class="text-sm text-[#D1D5DB] mt-1">${escHtml(a.message)}</p>
+                <small class="text-xs text-[#9CA3AF] block mt-2">${new Date(a.created_at).toLocaleString()}</small>
+              </div>
+            </div>
+          </div>`;
+        }
+      }
+
+      // Personal notifications
+      const notifications = data.notifications || [];
+      if (notifications.length) {
+        for (const n of notifications) {
+          const isRead = n.is_read;
+          const readClass = isRead ? 'notif-read' : 'notif-unread';
+          html += `<div id="notif-${n.id}" class="glass-card rounded-2xl p-4 notif-card ${readClass} transition-all">
+            <div class="flex items-start gap-3">
+              <i data-lucide="bell" class="w-5 h-5 text-[#8B5CF6] flex-shrink-0 mt-0.5"></i>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <strong class="notif-title text-sm font-semibold">${escHtml(n.title)}</strong>
+                  ${!isRead ? '<span class="badge-unread">New</span>' : ''}
+                </div>
+                <p class="text-sm text-[#D1D5DB] mt-1">${escHtml(n.message)}</p>
+                <div class="flex items-center justify-between mt-2 flex-wrap gap-2">
+                  <small class="text-xs text-[#9CA3AF]">${new Date(n.created_at).toLocaleString()}</small>
+                  ${!isRead ? `<button onclick="markRead(${n.id})" class="mark-read-btn">Mark as read</button>` : ''}
+                </div>
+              </div>
+            </div>
+          </div>`;
+        }
+      }
+
+      if (!html) {
+        html = `<div class="glass-card rounded-2xl p-6 text-center">
+          <i data-lucide="bell-off" class="w-12 h-12 text-[#6B7280] mx-auto mb-3"></i>
+          <p class="text-[#9CA3AF] font-medium">No notifications yet.</p>
+          <p class="text-xs text-[#6B7280] mt-1">We'll notify you when something important happens.</p>
+        </div>`;
+      }
+
+      document.getElementById('notificationsList').innerHTML = html;
+
+      // Re-initialize Lucide icons for dynamic content
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+
+      // If opening the page, mark unread personal notifications as read so badge drops to 0.
+      if (markAllReadOnOpen) {
+        const unreadIds = notifications.filter(x => !x.is_read).map(x => x.id);
+        if (unreadIds.length) {
+          await Promise.all(
+            unreadIds.map(id =>
+              fetch(`/users/notifications/${id}/read`, {
+                method: 'PATCH',
+                headers: { 'Authorization': 'Bearer ' + token },
+              })
+            )
+          );
+          await loadNotifications({ markAllReadOnOpen: false });
+        }
+      }
+    }
+
+    async function markRead(id) {
+      // Optimistically decrement badge immediately for snappy feel
+      const alertBadge = document.getElementById('alertBadge');
+      if (alertBadge && !alertBadge.classList.contains('hidden')) {
+        const current = parseInt(alertBadge.textContent, 10) || 0;
+        const next = Math.max(0, current - 1);
+        if (next === 0) {
+          alertBadge.textContent = '0';
+          alertBadge.classList.add('hidden');
+        } else {
+          alertBadge.textContent = next;
+        }
+      }
+      await fetch(`/users/notifications/${id}/read`, {
+        method: 'PATCH',
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      await loadNotifications({ markAllReadOnOpen: false });
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ---- Logout (preserved) ----
+    document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+      e.preventDefault();
+      const refresh = sessionStorage.getItem('refresh_token');
+      await fetch('/auth/logout', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refresh }),
+      });
+      sessionStorage.clear();
+      window.location.href = '/login';
+    });
+
+    // ---- Load notifications (mark as read on open for unread personal notifications) ----
+    loadNotifications({ markAllReadOnOpen: true });
+
+    // ---- Set avatar initial ----
+    async function setAvatar() {
+      try {
+        const res = await fetch('/api/dashboard', { headers: { 'Authorization': 'Bearer ' + token } });
+        if (res.ok) {
+          const data = await res.json();
+          const initial = document.getElementById('avatarInitial');
+          if (initial && data.username) {
+            initial.textContent = data.username.charAt(0).toUpperCase();
+          }
+        }
+      } catch (_) {}
+    }
+    setAvatar();
+
+    // ---- Lucide icons ----
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    });
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 300);
+  </script>
+
+</body>
+</html>

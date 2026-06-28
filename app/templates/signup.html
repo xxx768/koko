@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Sign Up – nova earns</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+
+ <link rel="stylesheet" href="/static/output.css" />
+  <script src="/static/lucide.js"></script>
+
+  <style>
+    /* ----- base reset & theme ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #09090B;
+      color: #FFFFFF;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #8B5CF6, #A855F7, #D946EF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7C3AED, #8B5CF6, #A855F7);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.30);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.45);
+    }
+    .btn-primary:active {
+      transform: scale(0.96);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s ease;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+    .btn-secondary:active {
+      transform: scale(0.96);
+    }
+
+    .auth-input {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(139, 92, 246, 0.20);
+      border-radius: 12px;
+      padding: 12px 16px;
+      width: 100%;
+      color: #FFFFFF;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    .auth-input:focus {
+      border-color: #8B5CF6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.20);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .auth-input::placeholder {
+      color: #6B7280;
+    }
+    .auth-input:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 1000px #1a1a2e inset !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+    }
+
+    .auth-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #D1D5DB;
+      margin-bottom: 6px;
+    }
+
+    .auth-link {
+      color: #A855F7;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .auth-link:hover {
+      color: #C4B5FD;
+      text-decoration: underline;
+    }
+
+    .msg-error {
+      background: rgba(239, 68, 68, 0.10);
+      border: 1px solid rgba(239, 68, 68, 0.20);
+      color: #EF4444;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+    .msg-success {
+      background: rgba(34, 197, 94, 0.10);
+      border: 1px solid rgba(34, 197, 94, 0.20);
+      color: #22C55E;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+
+    .helper-text {
+      color: #9CA3AF;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .auth-container {
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
+    .stat-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9CA3AF;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: #6B7280;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .tap-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    .referral-input {
+      text-transform: uppercase;
+    }
+
+    /* ----- field validation states ----- */
+    .auth-input.input-error {
+      border-color: #EF4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+    }
+    .auth-input.input-success {
+      border-color: #22C55E !important;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12) !important;
+    }
+    .field-error {
+      color: #EF4444;
+      font-size: 11.5px;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 18px;
+    }
+    .field-success {
+      color: #22C55E;
+      font-size: 11.5px;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 18px;
+    }
+
+    /* password strength meter */
+    .strength-bar-wrap {
+      display: flex;
+      gap: 4px;
+      margin-top: 7px;
+    }
+    .strength-seg {
+      flex: 1;
+      height: 4px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.08);
+      transition: background 0.3s;
+    }
+    .strength-label {
+      font-size: 11px;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* Step indicators */
+    .step-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(139, 92, 246, 0.2);
+      color: #9CA3AF;
+      transition: all 0.3s ease;
+    }
+    .step-dot.active {
+      background: #8B5CF6;
+      border-color: #8B5CF6;
+      color: #FFFFFF;
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    }
+    .step-dot.completed {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: #22C55E;
+      color: #22C55E;
+    }
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      transition: background 0.3s ease;
+    }
+    .step-line.completed {
+      background: #8B5CF6;
+    }
+
+    /* Step content */
+    .step-panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .step-panel.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Summary cards */
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .summary-item:last-child {
+      border-bottom: none;
+    }
+    .summary-label {
+      color: #9CA3AF;
+      font-size: 13px;
+    }
+    .summary-value {
+      color: #FFFFFF;
+      font-weight: 500;
+      font-size: 13px;
+      text-align: right;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <div class="glass-card rounded-2xl p-6 md:p-8">
+
+      <!-- Branding & Tagline -->
+      <div class="text-center">
+        <div class="mx-auto mb-3 w-16 h-16 rounded-full overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+            <img src="/static/nova.svg" alt="nova earns logo" />
+        </div>
+        <h1 class="text-3xl font-extrabold gradient-text tracking-tight">nova earns</h1>
+        <p class="text-[#9CA3AF] text-sm font-medium mt-1">Nigeria's #1 Online Earning Platform</p>
+        <p class="text-[#6B7280] text-xs mt-0.5">Earn · Grow · Win</p>
+      </div>
+
+      <!-- Trust Stats -->
+      <div class="grid grid-cols-3 gap-2 py-4 my-4 border-y border-white/5">
+        <div class="stat-item">
+          <p class="stat-value">147,637+</p>
+          <p class="stat-label">Active Users</p>
+        </div>
+        <div class="stat-item">
+          <p class="stat-value">₦2.4B+</p>
+          <p class="stat-label">Total Paid Out</p>
+        </div>
+        <div class="stat-item">
+          <p class="stat-value">100%</p>
+          <p class="stat-label">Satisfaction</p>
+        </div>
+      </div>
+
+      <!-- Step Indicators -->
+      <div class="flex items-center gap-2 mb-6">
+        <div class="step-dot active" id="stepDot1">1</div>
+        <div class="step-line" id="stepLine1"></div>
+        <div class="step-dot" id="stepDot2">2</div>
+        <div class="step-line" id="stepLine2"></div>
+        <div class="step-dot" id="stepDot3">3</div>
+      </div>
+
+      <!-- Sign Up Form (PRESERVED ID: signupForm) -->
+      <form id="signupForm" class="space-y-4">
+
+        <!-- ===== STEP 1: Personal Info ===== -->
+        <div class="step-panel active" data-step="1">
+          <p class="text-sm text-[#9CA3AF] mb-4">Let's start with your basic details.</p>
+
+          <!-- Username -->
+          <div class="mb-4">
+            <label for="username" class="auth-label">Username</label>
+            <div class="relative">
+              <i data-lucide="user" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none"></i>
+              <input type="text" id="username" name="username" required minlength="5" maxlength="50"
+                     class="auth-input pl-10" placeholder="Choose a username (min. 5 chars)">
+            </div>
+            <div id="usernameMsg" class="field-error" style="display:none;"></div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-4">
+            <label for="email" class="auth-label">Email</label>
+            <div class="relative">
+              <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none"></i>
+              <input type="email" id="email" name="email" required class="auth-input pl-10" placeholder="you@example.com">
+            </div>
+            <div id="emailMsg" class="field-error" style="display:none;"></div>
+          </div>
+
+          <!-- Phone Number -->
+          <div>
+            <label for="phone_number" class="auth-label">Phone Number</label>
+            <div class="relative">
+              <i data-lucide="phone" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none"></i>
+              <input type="tel" id="phone_number" name="phone_number" required placeholder="08012345678 (11 digits)" class="auth-input pl-10" maxlength="11">
+            </div>
+            <div id="phoneMsg" class="field-error" style="display:none;"></div>
+          </div>
+
+          <!-- Navigation buttons for step 1 -->
+          <div class="flex justify-end mt-6">
+            <button type="button" class="btn-primary text-white font-semibold py-2.5 px-6 rounded-xl transition-all tap-target flex items-center gap-2" id="step1Next">
+              Next <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 2: Password & Referral ===== -->
+        <div class="step-panel" data-step="2">
+          <p class="text-sm text-[#9CA3AF] mb-4">Create a secure password and add a referral code if you have one.</p>
+
+          <!-- Password -->
+          <div class="mb-4">
+            <label for="password" class="auth-label">Password</label>
+            <div class="relative">
+              <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none"></i>
+              <input type="password" id="password" name="password" required minlength="6" class="auth-input pl-10 pr-12" placeholder="Create a password (min. 6 chars)">
+              <button type="button" class="toggle-password absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-white transition-colors tap-target flex items-center justify-center" data-target="password">
+                <i data-lucide="eye" class="w-5 h-5"></i>
+              </button>
+            </div>
+            <!-- Strength meter -->
+            <div class="strength-bar-wrap" id="strengthBars">
+              <div class="strength-seg" id="seg1"></div>
+              <div class="strength-seg" id="seg2"></div>
+              <div class="strength-seg" id="seg3"></div>
+              <div class="strength-seg" id="seg4"></div>
+            </div>
+            <div id="strengthLabel" class="strength-label" style="display:none;"></div>
+            <div id="passwordMsg" class="field-error" style="display:none;"></div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="mb-4">
+            <label for="confirm_password" class="auth-label">Confirm Password</label>
+            <div class="relative">
+              <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none"></i>
+              <input type="password" id="confirm_password" name="confirm_password" required minlength="6" class="auth-input pl-10 pr-12" placeholder="Confirm your password">
+              <button type="button" class="toggle-password absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-white transition-colors tap-target flex items-center justify-center" data-target="confirm_password">
+                <i data-lucide="eye" class="w-5 h-5"></i>
+              </button>
+            </div>
+            <div id="confirmPasswordMsg" class="field-error" style="display:none;"></div>
+          </div>
+
+          <!-- Referral Code -->
+          <div>
+            <label for="referral_code" class="auth-label">Referral Code (optional)</label>
+            <div class="relative">
+              <i data-lucide="gift" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none"></i>
+              <input type="text" id="referral_code" name="referral_code" maxlength="20"
+                     placeholder="e.g. ABC12345" class="auth-input pl-10 referral-input">
+            </div>
+          </div>
+
+          <!-- Navigation buttons for step 2 -->
+          <div class="flex justify-between mt-6">
+            <button type="button" class="btn-secondary text-white font-semibold py-2.5 px-6 rounded-xl transition-all tap-target flex items-center gap-2" id="step2Prev">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i> Back
+            </button>
+            <button type="button" class="btn-primary text-white font-semibold py-2.5 px-6 rounded-xl transition-all tap-target flex items-center gap-2" id="step2Next">
+              Next <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 3: Review & Submit ===== -->
+        <div class="step-panel" data-step="3">
+          <p class="text-sm text-[#9CA3AF] mb-4">Review your information before creating your account.</p>
+
+          <!-- Summary -->
+          <div class="bg-white/5 rounded-xl p-4 mb-4">
+            <div class="summary-item">
+              <span class="summary-label">Username</span>
+              <span class="summary-value" id="summaryUsername">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Email</span>
+              <span class="summary-value" id="summaryEmail">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Phone</span>
+              <span class="summary-value" id="summaryPhone">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Referral Code</span>
+              <span class="summary-value" id="summaryReferral">None</span>
+            </div>
+          </div>
+
+          <!-- Error & Success Messages (PRESERVED IDs) -->
+          <div id="errorMsg" class="msg-error" style="display:none;"></div>
+          <div id="successMsg" class="msg-success" style="display:none;"></div>
+
+          <!-- Navigation buttons for step 3 -->
+          <div class="flex justify-between mt-6">
+            <button type="button" class="btn-secondary text-white font-semibold py-2.5 px-6 rounded-xl transition-all tap-target flex items-center gap-2" id="step3Prev">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i> Back
+            </button>
+            <button type="submit" class="btn-primary text-white font-semibold py-2.5 px-6 rounded-xl transition-all tap-target flex items-center gap-2">
+              <i data-lucide="user-plus" class="w-5 h-5"></i>
+              Create Account
+            </button>
+          </div>
+        </div>
+
+      </form>
+
+      <!-- Divider & Social -->
+      <div class="divider my-5">
+        <span class="divider-line"></span>
+        <span></span>
+        <span class="divider-line"></span>
+      </div>
+      <p class="text-center text-sm text-[#9CA3AF] mt-5">
+        Already have an account? <a href="/login" class="auth-link">Log in</a>
+      </p>
+
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    //  VALIDATION HELPERS
+    // ============================================================
+    function showFieldError(inputEl, msgEl, message) {
+      inputEl.classList.add('input-error');
+      inputEl.classList.remove('input-success');
+      msgEl.className = 'field-error';
+      msgEl.innerHTML = '&#10005; ' + message;
+      msgEl.style.display = 'flex';
+    }
+    function showFieldSuccess(inputEl, msgEl, message) {
+      inputEl.classList.remove('input-error');
+      inputEl.classList.add('input-success');
+      msgEl.className = 'field-success';
+      msgEl.innerHTML = '&#10003; ' + message;
+      msgEl.style.display = 'flex';
+    }
+    function clearField(inputEl, msgEl) {
+      inputEl.classList.remove('input-error', 'input-success');
+      msgEl.style.display = 'none';
+    }
+
+    function validateUsername() {
+      const el = document.getElementById('username');
+      const msg = document.getElementById('usernameMsg');
+      const val = el.value.trim();
+      if (!val) { showFieldError(el, msg, 'Username is required.'); return false; }
+      if (val.length < 5) { showFieldError(el, msg, 'Username must be at least 5 characters.'); return false; }
+      if (val.length > 50) { showFieldError(el, msg, 'Username must be 50 characters or fewer.'); return false; }
+      if (!/^[a-zA-Z0-9_]+$/.test(val)) { showFieldError(el, msg, 'Only letters, numbers, and underscores allowed.'); return false; }
+      showFieldSuccess(el, msg, 'Looks good!');
+      return true;
+    }
+
+    function validateEmail() {
+      const el = document.getElementById('email');
+      const msg = document.getElementById('emailMsg');
+      const val = el.value.trim();
+      if (!val) { showFieldError(el, msg, 'Email is required.'); return false; }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      if (!emailRegex.test(val)) { showFieldError(el, msg, 'Enter a valid email address.'); return false; }
+      showFieldSuccess(el, msg, 'Valid email!');
+      return true;
+    }
+
+    function validatePhone() {
+      const el = document.getElementById('phone_number');
+      const msg = document.getElementById('phoneMsg');
+      const val = el.value.trim().replace(/\s/g, '');
+      if (!val) { showFieldError(el, msg, 'Phone number is required.'); return false; }
+      // Accept exactly 11 digits (Nigerian format e.g. 08012345678)
+      if (!/^\d{11}$/.test(val)) { showFieldError(el, msg, 'Phone number must be exactly 11 digits (e.g. 08012345678).'); return false; }
+      if (!/^0[7-9][01]\d{8}$/.test(val)) { showFieldError(el, msg, 'Enter a valid Nigerian phone number (e.g. 0801 234 5678).'); return false; }
+      showFieldSuccess(el, msg, 'Valid phone number!');
+      return true;
+    }
+
+    function passwordStrength(pw) {
+      let score = 0;
+      if (pw.length >= 6) score++;
+      if (pw.length >= 10) score++;
+      if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+      if (/\d/.test(pw) && /[^a-zA-Z0-9]/.test(pw)) score++;
+      return score; // 0-4
+    }
+
+    function updateStrengthMeter(pw) {
+      const colors = ['#EF4444', '#F97316', '#EAB308', '#22C55E'];
+      const labels = ['Weak', 'Fair', 'Good', 'Strong'];
+      const score = pw.length === 0 ? 0 : passwordStrength(pw);
+      const segs = ['seg1','seg2','seg3','seg4'];
+      const label = document.getElementById('strengthLabel');
+      segs.forEach((id, i) => {
+        document.getElementById(id).style.background =
+          pw.length === 0 ? 'rgba(255,255,255,0.08)' :
+          i < score ? colors[score - 1] : 'rgba(255,255,255,0.08)';
+      });
+      if (pw.length === 0) {
+        label.style.display = 'none';
+      } else {
+        label.style.display = 'block';
+        label.textContent = labels[score - 1] || 'Weak';
+        label.style.color = score > 0 ? colors[score - 1] : '#EF4444';
+      }
+    }
+
+    function validatePassword() {
+      const el = document.getElementById('password');
+      const msg = document.getElementById('passwordMsg');
+      const val = el.value;
+      if (!val) { showFieldError(el, msg, 'Password is required.'); return false; }
+      if (val.length < 6) { showFieldError(el, msg, 'Password must be at least 6 characters.'); return false; }
+      showFieldSuccess(el, msg, 'Password accepted.');
+      // also re-check confirm
+      const confirmEl = document.getElementById('confirm_password');
+      if (confirmEl.value) validateConfirmPassword();
+      return true;
+    }
+
+    function validateConfirmPassword() {
+      const el = document.getElementById('confirm_password');
+      const msg = document.getElementById('confirmPasswordMsg');
+      const val = el.value;
+      const pw = document.getElementById('password').value;
+      if (!val) { showFieldError(el, msg, 'Please confirm your password.'); return false; }
+      if (val !== pw) { showFieldError(el, msg, 'Passwords do not match.'); return false; }
+      showFieldSuccess(el, msg, 'Passwords match!');
+      return true;
+    }
+
+    function validateStep1() {
+      const a = validateUsername();
+      const b = validateEmail();
+      const c = validatePhone();
+      return a && b && c;
+    }
+
+    function validateStep2() {
+      const a = validatePassword();
+      const b = validateConfirmPassword();
+      return a && b;
+    }
+
+    // ============================================================
+    //  LIVE VALIDATION LISTENERS
+    // ============================================================
+    document.getElementById('username').addEventListener('input', validateUsername);
+    document.getElementById('email').addEventListener('blur', validateEmail);
+    document.getElementById('phone_number').addEventListener('input', function() {
+      // Strip non-digits as user types
+      this.value = this.value.replace(/\D/g, '').slice(0, 11);
+      validatePhone();
+    });
+    document.getElementById('password').addEventListener('input', function() {
+      updateStrengthMeter(this.value);
+      if (this.value.length >= 6) validatePassword();
+    });
+    document.getElementById('confirm_password').addEventListener('input', validateConfirmPassword);
+
+    // ============================================================
+    //  STEP NAVIGATION
+    // ============================================================
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    const panels = document.querySelectorAll('.step-panel');
+    const dots = [document.getElementById('stepDot1'), document.getElementById('stepDot2'), document.getElementById('stepDot3')];
+    const lines = [document.getElementById('stepLine1'), document.getElementById('stepLine2')];
+
+    function updateUI(step) {
+      panels.forEach((panel, idx) => {
+        panel.classList.toggle('active', (idx + 1) === step);
+      });
+      dots.forEach((dot, idx) => {
+        const num = idx + 1;
+        dot.classList.remove('active', 'completed');
+        if (num === step) dot.classList.add('active');
+        else if (num < step) dot.classList.add('completed');
+      });
+      lines.forEach((line, idx) => {
+        line.classList.toggle('completed', (idx + 1) < step);
+      });
+      if (step === 3) {
+        document.getElementById('summaryUsername').textContent = document.getElementById('username').value || '—';
+        document.getElementById('summaryEmail').textContent = document.getElementById('email').value || '—';
+        document.getElementById('summaryPhone').textContent = document.getElementById('phone_number').value || '—';
+        const ref = document.getElementById('referral_code').value.trim() || 'None';
+        document.getElementById('summaryReferral').textContent = ref;
+      }
+    }
+
+    function goToStep(step) {
+      if (step < 1 || step > totalSteps) return;
+      if (step > currentStep) {
+        if (currentStep === 1 && !validateStep1()) return;
+        if (currentStep === 2 && !validateStep2()) return;
+      }
+      currentStep = step;
+      updateUI(step);
+    }
+
+    document.getElementById('step1Next').addEventListener('click', () => goToStep(2));
+    document.getElementById('step2Prev').addEventListener('click', () => goToStep(1));
+    document.getElementById('step2Next').addEventListener('click', () => goToStep(3));
+    document.getElementById('step3Prev').addEventListener('click', () => goToStep(2));
+
+    // ----- PASSWORD TOGGLES -----
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const targetId = this.dataset.target;
+        const input = document.getElementById(targetId);
+        if (!input) return;
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        const icon = this.querySelector('i');
+        if (icon) {
+          icon.setAttribute('data-lucide', type === 'password' ? 'eye' : 'eye-off');
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+      });
+    });
+
+    // ----- PRESERVED ORIGINAL SIGNUP LOGIC (DO NOT MODIFY) -----
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) document.getElementById('referral_code').value = refCode.toUpperCase();
+
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      // Final gate: re-validate all fields
+      if (!validateStep1() || !validateStep2()) {
+        document.getElementById('errorMsg').textContent = 'Please fix the errors above before submitting.';
+        document.getElementById('errorMsg').style.display = 'block';
+        return;
+      }
+
+      const errorEl = document.getElementById('errorMsg');
+      const successEl = document.getElementById('successMsg');
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm_password').value;
+
+      if (password !== confirm) {
+        errorEl.textContent = 'Passwords do not match.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      const referralCodeRaw = document.getElementById('referral_code').value.trim().toUpperCase();
+
+      const payload = {
+        username: document.getElementById('username').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone_number: document.getElementById('phone_number').value.trim(),
+        password,
+        confirm_password: confirm,
+        referral_code: referralCodeRaw || null,
+      };
+
+      try {
+        const res = await fetch('/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errorEl.textContent = data.detail || 'Registration failed.';
+          errorEl.style.display = 'block';
+          return;
+        }
+        successEl.textContent = data.message + ' Redirecting to verification...';
+        successEl.style.display = 'block';
+        sessionStorage.setItem('pending_email', payload.email);
+        setTimeout(() => window.location.href = '/verify-email', 2000);
+      } catch (err) {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // ----- INIT -----
+    updateUI(1);
+
+    // ----- LUCIDE ICONS -----
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 300);
+  </script>
+
+</body>
+</html>

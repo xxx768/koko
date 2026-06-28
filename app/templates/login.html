@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Login – nova earns</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+
+  <link rel="stylesheet" href="/static/output.css" />
+  <script src="/static/lucide.js"></script>
+
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ----- base reset & theme ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #09090B;
+      color: #FFFFFF;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* glassmorphism card */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    /* gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #8B5CF6, #A855F7, #D946EF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* gradient buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #7C3AED, #8B5CF6, #A855F7);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.30);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.45);
+    }
+    .btn-primary:active {
+      transform: scale(0.96);
+    }
+
+    /* form inputs */
+    .auth-input {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(139, 92, 246, 0.20);
+      border-radius: 12px;
+      padding: 12px 16px;
+      width: 100%;
+      color: #FFFFFF;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    .auth-input:focus {
+      border-color: #8B5CF6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.20);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .auth-input::placeholder {
+      color: #6B7280;
+    }
+    .auth-input:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 1000px #1a1a2e inset !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+    }
+
+    .auth-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #D1D5DB;
+      margin-bottom: 6px;
+    }
+
+    .auth-link {
+      color: #A855F7;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .auth-link:hover {
+      color: #C4B5FD;
+      text-decoration: underline;
+    }
+
+    /* error messages */
+    .msg-error {
+      background: rgba(239, 68, 68, 0.10);
+      border: 1px solid rgba(239, 68, 68, 0.20);
+      color: #EF4444;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+
+    /* max-width container */
+    .auth-container {
+      max-width: 400px;
+      width: 100%;
+    }
+
+    /* stats row */
+    .stat-item {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
+    .stat-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9CA3AF;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: #6B7280;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* tap targets */
+    .tap-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* ----- field validation states ----- */
+    .auth-input.input-error {
+      border-color: #EF4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+    }
+    .auth-input.input-success {
+      border-color: #22C55E !important;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12) !important;
+    }
+    .field-error {
+      color: #EF4444;
+      font-size: 11.5px;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .field-success {
+      color: #22C55E;
+      font-size: 11.5px;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <div class="glass-card rounded-2xl p-6 md:p-8">
+
+      <!-- Branding & Tagline -->
+      <div class="text-center">
+        <div class="mx-auto mb-3 w-16 h-16 rounded-full overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+          <img src="/static/nova.svg" alt="nova earns logo" />
+        </div>
+        <h1 class="text-3xl font-extrabold gradient-text tracking-tight">nova earns</h1>
+        <p class="text-[#9CA3AF] text-sm font-medium mt-1">Nigeria's #1 Online Earning Platform</p>
+        <p class="text-[#6B7280] text-xs mt-0.5">Earn · Grow · Win</p>
+      </div>
+
+      <!-- Trust Stats -->
+      <div class="grid grid-cols-3 gap-2 py-4 my-4 border-y border-white/5">
+        <div class="stat-item">
+          <p class="stat-value">147,637+</p>
+          <p class="stat-label">Active Users</p>
+        </div>
+        <div class="stat-item">
+          <p class="stat-value">₦2.4B+</p>
+          <p class="stat-label">Total Paid Out</p>
+        </div>
+        <div class="stat-item">
+          <p class="stat-value">100%</p>
+          <p class="stat-label">Satisfaction</p>
+        </div>
+      </div>
+
+      <!-- Login Form (PRESERVED ID: loginForm) -->
+      <form id="loginForm" class="space-y-4">
+        <!-- Email -->
+        <div>
+          <label for="email" class="auth-label">Email</label>
+          <div class="relative">
+            <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none"></i>
+            <!-- PRESERVED ID: email -->
+            <input type="email" id="email" name="email" required autocomplete="email" class="auth-input pl-10" placeholder="Enter your email">
+          </div>
+          <div id="emailMsg" class="field-error" style="display:none;"></div>
+        </div>
+
+        <!-- Password with Toggle -->
+        <div>
+          <label for="password" class="auth-label">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none"></i>
+            <!-- PRESERVED ID: password -->
+            <input type="password" id="password" name="password" required autocomplete="current-password" class="auth-input pl-10 pr-12" placeholder="Enter your password">
+            <button type="button" id="togglePassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-white transition-colors tap-target flex items-center justify-center">
+              <i data-lucide="eye" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <div id="passwordMsg" class="field-error" style="display:none;"></div>
+          <!-- Forgot Password -->
+          <div class="text-right mt-1.5">
+            <a href="#" class="text-xs text-[#9CA3AF] hover:text-[#C4B5FD] transition-colors">Forgot Password?</a>
+          </div>
+        </div>
+
+        <!-- Error Message (PRESERVED ID: errorMsg) -->
+        <div id="errorMsg" class="msg-error" style="display:none;"></div>
+
+        <!-- Login Button -->
+        <button type="submit" class="btn-primary w-full text-white font-semibold py-3 rounded-xl transition-all tap-target flex items-center justify-center gap-2">
+          <i data-lucide="log-in" class="w-5 h-5"></i>
+          Login
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="divider my-5">
+        <span class="divider-line"></span>
+        <span></span>
+        <span class="divider-line"></span>
+      </div>
+
+      <!-- Sign Up Link -->
+      <p class="text-center text-sm text-[#9CA3AF] mt-5">
+        Don't have an account? <a href="/signup" class="auth-link">Sign Up</a>
+      </p>
+
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    //  VALIDATION HELPERS
+    // ============================================================
+    function showFieldError(inputEl, msgEl, message) {
+      inputEl.classList.add('input-error');
+      inputEl.classList.remove('input-success');
+      msgEl.className = 'field-error';
+      msgEl.innerHTML = '&#10005; ' + message;
+      msgEl.style.display = 'flex';
+    }
+    function clearField(inputEl, msgEl) {
+      inputEl.classList.remove('input-error', 'input-success');
+      msgEl.style.display = 'none';
+    }
+
+    function validateLoginEmail() {
+      const el = document.getElementById('email');
+      const msg = document.getElementById('emailMsg');
+      const val = el.value.trim();
+      if (!val) { showFieldError(el, msg, 'Email is required.'); return false; }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      if (!emailRegex.test(val)) { showFieldError(el, msg, 'Enter a valid email address.'); return false; }
+      clearField(el, msg);
+      return true;
+    }
+
+    function validateLoginPassword() {
+      const el = document.getElementById('password');
+      const msg = document.getElementById('passwordMsg');
+      const val = el.value;
+      if (!val) { showFieldError(el, msg, 'Password is required.'); return false; }
+      if (val.length < 6) { showFieldError(el, msg, 'Password must be at least 6 characters.'); return false; }
+      clearField(el, msg);
+      return true;
+    }
+
+    // Live validation on blur
+    document.getElementById('email').addEventListener('blur', validateLoginEmail);
+    document.getElementById('password').addEventListener('blur', validateLoginPassword);
+
+    // ----- PASSWORD TOGGLE (NEW UI ENHANCEMENT) -----
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      const icon = this.querySelector('i');
+      if (icon) {
+        icon.setAttribute('data-lucide', type === 'password' ? 'eye' : 'eye-off');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      }
+    });
+
+    // ----- PRESERVED ORIGINAL LOGIN LOGIC (DO NOT MODIFY) -----
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      // Front-end gate
+      const emailOk = validateLoginEmail();
+      const passwordOk = validateLoginPassword();
+      if (!emailOk || !passwordOk) return;
+
+      const errorEl = document.getElementById('errorMsg');
+      errorEl.style.display = 'none';
+
+      const payload = {
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+      };
+
+      try {
+        const res = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errorEl.textContent = data.detail || 'Login failed.';
+          errorEl.style.display = 'block';
+          return;
+        }
+        sessionStorage.setItem('access_token', data.access_token);
+        sessionStorage.setItem('refresh_token', data.refresh_token);
+        window.location.href = '/dashboard';
+      } catch (err) {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // ----- LUCIDE ICONS -----
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 300);
+  </script>
+
+</body>
+</html>

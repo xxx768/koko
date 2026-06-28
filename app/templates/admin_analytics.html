@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Analytics – Nova Earns</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="stylesheet" href="/static/output.css" />
+  <script src="/static/lucide.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #09090B;
+      color: #FFFFFF;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #8B5CF6, #A855F7, #D946EF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s ease;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+    .btn-secondary:active { transform: scale(0.96); }
+
+    .admin-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #9CA3AF;
+      margin-bottom: 2px;
+    }
+
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .admin-table th {
+      text-align: left;
+      padding: 10px 12px;
+      color: #9CA3AF;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: rgba(255,255,255,0.02);
+    }
+    .admin-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+      color: #D1D5DB;
+    }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+    .admin-container { max-width: 1400px; margin: 0 auto; padding: 0 12px; }
+
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(139, 92, 246, 0.08);
+      padding: 8px 0;
+    }
+
+    .tap-target { min-height: 36px; min-width: 36px; }
+
+    ::-webkit-scrollbar { width: 0; height: 0; }
+    .hidden-section { display: none; }
+
+    .badge-status {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 500;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      white-space: nowrap;
+    }
+
+    /* ====== SIDEBAR LAYOUT ====== */
+    .app-shell { display: flex; min-height: calc(100vh - 53px); }
+
+    .sidebar {
+      width: 64px;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.03);
+      border-right: 1px solid rgba(139, 92, 246, 0.10);
+      padding: 12px 8px;
+      position: sticky;
+      top: 53px;
+      height: calc(100vh - 53px);
+      overflow-y: auto;
+      transition: width 0.25s ease;
+      z-index: 30;
+    }
+    .sidebar.expanded { width: 220px; }
+
+    .sidebar-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      border: none;
+      color: #9CA3AF;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .sidebar-toggle:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .sidebar.expanded .sidebar-toggle { justify-content: flex-start; }
+
+    .sidebar-nav-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      margin-bottom: 4px;
+      border-radius: 10px;
+      background: transparent;
+      border: none;
+      color: #9CA3AF;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-decoration: none;
+    }
+    .sidebar-nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .sidebar-nav-item.active {
+      background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(168,85,247,0.18));
+      color: #fff;
+      box-shadow: inset 0 0 0 1px rgba(139,92,246,0.35);
+    }
+    .sidebar-nav-item .nav-label { opacity: 0; width: 0; transition: opacity 0.2s ease; }
+    .sidebar.expanded .sidebar-nav-item .nav-label { opacity: 1; width: auto; }
+    .sidebar-nav-item i { flex-shrink: 0; }
+
+    .main-content { flex: 1; min-width: 0; padding: 16px 12px; }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 53px;
+        height: calc(100vh - 53px);
+        width: 64px;
+        z-index: 50;
+      }
+      .sidebar.expanded { width: 200px; box-shadow: 8px 0 24px rgba(0,0,0,0.5); }
+      .main-content { padding-left: 12px; }
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        top: 53px;
+        background: rgba(0,0,0,0.5);
+        z-index: 45;
+      }
+      .sidebar-backdrop.active { display: block; }
+    }
+
+    /* ====== ANALYTICS-SPECIFIC ====== */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9CA3AF;
+      margin: 28px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-label:first-child { margin-top: 0; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 12px;
+    }
+    .stat-card {
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .stat-card-label {
+      font-size: 11px;
+      color: #9CA3AF;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+    .stat-card-value { font-size: 24px; font-weight: 700; }
+    .stat-card-value.green  { color: #22C55E; }
+    .stat-card-value.blue   { color: #60A5FA; }
+    .stat-card-value.red    { color: #F87171; }
+    .stat-card-value.purple { color: #C4B5FD; }
+    .stat-card-value.amber  { color: #FBBF24; }
+    .stat-card-sub { font-size: 11px; color: #6B7280; margin-top: 4px; }
+
+    .panel-header {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .panel-title { font-size: 14px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 6px; }
+    .panel-meta  { font-size: 12px; color: #6B7280; }
+
+    .chart-wrap { padding: 18px 16px 12px; }
+    .chart-legend { display: flex; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
+    .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; }
+    .legend-item { font-size: 12px; color: #9CA3AF; display: flex; align-items: center; }
+
+    .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 150px; }
+    .bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .bar-pair { display: flex; gap: 3px; align-items: flex-end; width: 100%; }
+    .bar { flex: 1; border-radius: 4px 4px 0 0; min-height: 3px; transition: opacity .2s; cursor: default; }
+    .bar:hover { opacity: .75; }
+    .bar.fees  { background: #8B5CF6; }
+    .bar.bonus { background: #FBBF24; }
+    .bar-day   { font-size: 10px; color: #6B7280; margin-top: 6px; }
+    .chart-empty {
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6B7280;
+      font-size: 13px;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+      padding: 16px;
+    }
+    .status-card { border-radius: 10px; padding: 12px 14px; font-size: 13px; border: 1px solid transparent; }
+    .status-card .count { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
+    .status-card.pending-payment      { background: rgba(251,191,36,0.10); color: #FBBF24; border-color: rgba(251,191,36,0.20); }
+    .status-card.pending-verification { background: rgba(250,204,21,0.10); color: #FACC15; border-color: rgba(250,204,21,0.20); }
+    .status-card.processing           { background: rgba(96,165,250,0.10); color: #60A5FA; border-color: rgba(96,165,250,0.20); }
+    .status-card.completed            { background: rgba(34,197,94,0.10);  color: #22C55E; border-color: rgba(34,197,94,0.20); }
+    .status-card.rejected             { background: rgba(239,68,68,0.10);  color: #F87171; border-color: rgba(239,68,68,0.20); }
+
+    .filter-row { display: flex; gap: 8px; padding: 12px 16px; flex-wrap: wrap; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .filter-btn {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 13px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: #9CA3AF;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .filter-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .filter-btn.active {
+      background: linear-gradient(135deg, #7C3AED, #8B5CF6);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 9px;
+      border-radius: 20px;
+      border: 1px solid transparent;
+    }
+    .badge.completed             { background: rgba(34,197,94,0.10);  color: #22C55E; border-color: rgba(34,197,94,0.20); }
+    .badge.processing            { background: rgba(96,165,250,0.10); color: #60A5FA; border-color: rgba(96,165,250,0.20); }
+    .badge.pending-verification  { background: rgba(250,204,21,0.10); color: #FACC15; border-color: rgba(250,204,21,0.20); }
+    .badge.pending-payment       { background: rgba(251,191,36,0.10); color: #FBBF24; border-color: rgba(251,191,36,0.20); }
+    .badge.rejected              { background: rgba(239,68,68,0.10);  color: #F87171; border-color: rgba(239,68,68,0.20); }
+    .badge.paid                  { background: rgba(34,197,94,0.10);  color: #22C55E; border-color: rgba(34,197,94,0.20); }
+    .badge.pending               { background: rgba(255,255,255,0.06); color: #9CA3AF; border-color: rgba(255,255,255,0.08); }
+
+    .type-icon { margin-right: 6px; }
+
+    .tx-empty { padding: 36px 16px; text-align: center; color: #6B7280; font-size: 13px; }
+
+    .state-msg { text-align: center; padding: 80px 20px; color: #6B7280; font-size: 15px; }
+    .state-msg.error { color: #F87171; }
+
+    @media (max-width: 600px) {
+      .cards { grid-template-columns: 1fr 1fr; }
+      .admin-table th:nth-child(3),
+      .admin-table td:nth-child(3) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== STICKY HEADER ====== -->
+  <header class="sticky-header admin-container flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center gap-2">
+      <span class="text-lg font-extrabold gradient-text">Nova Earns</span>
+      <span class="text-[9px] font-medium text-[#9CA3AF] bg-white/5 px-2 py-0.5 rounded-full">Admin</span>
+    </div>
+    <div class="flex items-center gap-3 text-sm flex-wrap">
+      <a href="/dashboard" class="text-[#9CA3AF] hover:text-white transition-colors tap-target flex items-center gap-1.5">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> <span class="hidden sm:inline">User Dashboard</span>
+      </a>
+      <a href="/survey-admin" class="text-[#9CA3AF] hover:text-white transition-colors tap-target flex items-center gap-1.5">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i> <span class="hidden sm:inline">Manage Surveys</span>
+      </a>
+      <a href="/admin-analytics" class="text-white transition-colors tap-target flex items-center gap-1.5">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> <span class="hidden sm:inline">Analytics</span>
+      </a>
+      <a href="#" id="logoutBtn" class="text-[#9CA3AF] hover:text-[#F87171] transition-colors tap-target flex items-center gap-1.5">
+        <i data-lucide="log-out" class="w-4 h-4"></i> <span class="hidden sm:inline">Logout</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <!-- ====== SIDEBAR ====== -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="closeMobileSidebar()"></div>
+    <aside id="sidebar" class="sidebar">
+      <button type="button" class="sidebar-toggle" onclick="toggleSidebar()" title="Expand menu">
+        <i data-lucide="panel-left" class="w-4 h-4"></i>
+        <span class="nav-label">Menu</span>
+      </button>
+      <a href="/admin-dashboard#usersPanel" class="sidebar-nav-item" title="Users">
+        <i data-lucide="users" class="w-4 h-4"></i><span class="nav-label">Users</span>
+      </a>
+      <a href="/admin-dashboard#withdrawalsPanel" class="sidebar-nav-item" title="Withdrawals">
+        <i data-lucide="credit-card" class="w-4 h-4"></i><span class="nav-label">Withdrawals</span>
+      </a>
+      <a href="/admin-dashboard#announcementsPanel" class="sidebar-nav-item" title="Announcements">
+        <i data-lucide="megaphone" class="w-4 h-4"></i><span class="nav-label">Announcements</span>
+      </a>
+      <a href="/survey-admin" class="sidebar-nav-item" title="Surveys">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i><span class="nav-label">Surveys</span>
+      </a>
+      <a href="/admin-dashboard#bonusPanel" class="sidebar-nav-item" title="Daily Bonus">
+        <i data-lucide="gift" class="w-4 h-4"></i><span class="nav-label">Daily Bonus</span>
+      </a>
+      <a href="/admin-dashboard#referralPanel" class="sidebar-nav-item" title="Referral Settings">
+        <i data-lucide="share-2" class="w-4 h-4"></i><span class="nav-label">Referral Settings</span>
+      </a>
+      <a href="/admin-dashboard#withdrawalSettingsPanel" class="sidebar-nav-item" title="Withdrawal Settings">
+        <i data-lucide="settings" class="w-4 h-4"></i><span class="nav-label">Withdrawal Settings</span>
+      </a>
+      <button type="button" class="sidebar-nav-item active" title="Analytics">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i><span class="nav-label">Analytics</span>
+      </button>
+    </aside>
+
+    <main class="main-content">
+      <div class="admin-container" style="margin:0; max-width:1100px; padding:0;">
+
+        <h1 class="text-xl font-bold text-white mb-1">Analytics</h1>
+        <p class="text-sm text-[#9CA3AF] mb-2">Platform overview, revenue report, and transaction logs</p>
+
+        <div id="loadingState" class="state-msg">Loading analytics…</div>
+        <div id="errorState" class="state-msg error hidden-section">Failed to load analytics.</div>
+
+        <div id="analyticsContent" class="hidden-section">
+
+          <!-- Platform Analytics -->
+          <div class="section-label"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Platform Analytics</div>
+          <div class="cards">
+            <div class="glass-card stat-card">
+              <div class="stat-card-label">Total Users</div>
+              <div class="stat-card-value blue" id="pTotalUsers">—</div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-card-label">Active Users</div>
+              <div class="stat-card-value green" id="pActiveUsers">—</div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-card-label">Suspended</div>
+              <div class="stat-card-value red" id="pSuspended">—</div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-card-label">Verified</div>
+              <div class="stat-card-value green" id="pVerified">—</div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-card-label">New This Week</div>
+              <div class="stat-card-value purple" id="pNewWeek">—</div>
+              <div class="stat-card-sub" id="pNewMonth"></div>
+            </div>
+          </div>
+
+          <!-- Revenue Report -->
+          <div class="section-label"><i data-lucide="wallet" class="w-3.5 h-3.5"></i> Revenue Report</div>
+          <div class="cards">
+            <div class="glass-card stat-card">
+              <div class="stat-card-label">Fees Collected</div>
+              <div class="stat-card-value green" id="rFees">—</div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-card-label">Total Withdrawn</div>
+              <div class="stat-card-value blue" id="rWithdrawn">—</div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-card-label">Pending Payouts</div>
+              <div class="stat-card-value amber" id="rPending">—</div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-card-label">Bonus Paid Out</div>
+              <div class="stat-card-value red" id="rBonus">—</div>
+              <div class="stat-card-sub" id="rBonusWeek"></div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-card-label">Referral Rewards</div>
+              <div class="stat-card-value purple" id="rReferral">—</div>
+              <div class="stat-card-sub" id="rReferralSub"></div>
+            </div>
+          </div>
+
+          <!-- Withdrawal Breakdown -->
+          <div class="section-label"><i data-lucide="landmark" class="w-3.5 h-3.5"></i> Withdrawal Breakdown</div>
+          <div class="glass-card rounded-2xl">
+            <div class="status-grid" id="withdrawalStatusGrid"></div>
+          </div>
+
+          <!-- Weekly Chart -->
+          <div class="section-label"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Weekly Activity</div>
+          <div class="glass-card rounded-2xl">
+            <div class="panel-header">
+              <span class="panel-title"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-[#8B5CF6]"></i> Fees & Bonus Paid — Last 7 Days</span>
+              <span class="panel-meta">Updated now</span>
+            </div>
+            <div class="chart-wrap">
+              <div class="chart-legend">
+                <span class="legend-item"><span class="legend-dot" style="background:#8B5CF6"></span>Fees Collected</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#FBBF24"></span>Bonus Paid</span>
+              </div>
+              <div id="weeklyChart" class="bar-chart"></div>
+            </div>
+          </div>
+
+          <!-- Transaction Log -->
+          <div class="section-label"><i data-lucide="receipt" class="w-3.5 h-3.5"></i> Transaction Log</div>
+          <div class="glass-card rounded-2xl">
+            <div class="panel-header">
+              <span class="panel-title"><i data-lucide="list" class="w-3.5 h-3.5 text-[#8B5CF6]"></i> Recent Transactions</span>
+              <span class="panel-meta" id="txTotal"></span>
+            </div>
+            <div class="filter-row">
+              <button class="filter-btn active" data-filter="all">All</button>
+              <button class="filter-btn" data-filter="withdrawal">Withdrawals</button>
+              <button class="filter-btn" data-filter="daily_bonus">Daily Bonus</button>
+              <button class="filter-btn" data-filter="referral_reward">Referrals</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>User ID</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Fee</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="txBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div><!-- /analyticsContent -->
+      </div>
+    </main>
+  </div>
+
+<script>
+  const token = sessionStorage.getItem('access_token');
+  if (!token) window.location.href = '/login';
+
+  function authHeaders() {
+    return { 'Authorization': 'Bearer ' + token };
+  }
+
+  // ---- SIDEBAR ----
+  function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    sb.classList.toggle('expanded');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (window.innerWidth <= 768) {
+      backdrop.classList.toggle('active', sb.classList.contains('expanded'));
+    }
+  }
+  function closeMobileSidebar() {
+    document.getElementById('sidebar').classList.remove('expanded');
+    document.getElementById('sidebarBackdrop').classList.remove('active');
+  }
+
+  function fmt(n) {
+    return '₦' + Number(n).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+           + ' ' + d.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function shortDay(dateStr) {
+    return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-NG', { weekday: 'short' });
+  }
+
+  // ── Withdrawal status grid ─────────────────────────────────────────────
+  function renderStatusGrid(counts) {
+    const labels = {
+      pending_payment:      { label: 'Pending Payment',      cls: 'pending-payment' },
+      pending_verification: { label: 'Pending Verification', cls: 'pending-verification' },
+      processing:           { label: 'Processing',           cls: 'processing' },
+      completed:            { label: 'Completed',            cls: 'completed' },
+      rejected:             { label: 'Rejected',             cls: 'rejected' },
+    };
+    document.getElementById('withdrawalStatusGrid').innerHTML =
+      Object.entries(labels).map(([key, { label, cls }]) => `
+        <div class="status-card ${cls}">
+          <div class="count">${counts[key] ?? 0}</div>
+          <div>${label}</div>
+        </div>
+      `).join('');
+  }
+
+  // ── Weekly bar chart ───────────────────────────────────────────────────
+  function renderChart(weeklyData) {
+    const el = document.getElementById('weeklyChart');
+    const maxFee   = Math.max(...weeklyData.map(d => d.fees), 1);
+    const maxBonus = Math.max(...weeklyData.map(d => d.bonus_paid), 1);
+    const maxVal   = Math.max(maxFee, maxBonus);
+
+    const allZero = weeklyData.every(d => d.fees === 0 && d.bonus_paid === 0);
+    if (allZero) {
+      el.outerHTML = '<div class="chart-empty">No activity in the last 7 days</div>';
+      return;
+    }
+
+    el.innerHTML = weeklyData.map(d => {
+      const feeH   = Math.max(Math.round((d.fees      / maxVal) * 100), d.fees      > 0 ? 4 : 0);
+      const bonusH = Math.max(Math.round((d.bonus_paid / maxVal) * 100), d.bonus_paid > 0 ? 4 : 0);
+      return `
+        <div class="bar-group">
+          <div class="bar-pair">
+            <div class="bar fees"  style="height:${feeH}%"   title="Fees: ${fmt(d.fees)}"></div>
+            <div class="bar bonus" style="height:${bonusH}%" title="Bonus: ${fmt(d.bonus_paid)}"></div>
+          </div>
+          <span class="bar-day">${shortDay(d.date)}</span>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Transaction table ──────────────────────────────────────────────────
+  let allTx = [];
+
+  const TX_ICONS = {
+    withdrawal:      '💸',
+    daily_bonus:     '🎁',
+    referral_reward: '👥',
+  };
+  const TX_LABELS = {
+    withdrawal:      'Withdrawal',
+    daily_bonus:     'Daily Bonus',
+    referral_reward: 'Referral Reward',
+  };
+
+  function badgeCls(status) {
+    return status.replace(/_/g, '-');
+  }
+
+  function renderTx(filter) {
+    const filtered = filter === 'all' ? allTx : allTx.filter(t => t.type === filter);
+    document.getElementById('txTotal').textContent = filtered.length + ' transactions';
+
+    const tbody = document.getElementById('txBody');
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="tx-empty">No transactions found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(tx => `
+      <tr>
+        <td><span class="type-icon">${TX_ICONS[tx.type] || '💰'}</span>${TX_LABELS[tx.type] || tx.type}</td>
+        <td>#${tx.user_id}</td>
+        <td>${fmtDate(tx.timestamp)}</td>
+        <td>${fmt(tx.amount)}</td>
+        <td>${tx.fee > 0 ? fmt(tx.fee) : '—'}</td>
+        <td><span class="badge ${badgeCls(tx.status)}">${tx.status.replace(/_/g, ' ')}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      renderTx(this.dataset.filter);
+    });
+  });
+
+  // ── Load ───────────────────────────────────────────────────────────────
+  async function loadAnalytics() {
+    try {
+      const res = await fetch('/admin/analytics', { headers: authHeaders() });
+      if (res.status === 401 || res.status === 403) { window.location.href = '/login'; return; }
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+
+      // Platform
+      const p = data.platform;
+      document.getElementById('pTotalUsers').textContent  = p.total_users;
+      document.getElementById('pActiveUsers').textContent = p.active_users;
+      document.getElementById('pSuspended').textContent   = p.suspended_users;
+      document.getElementById('pVerified').textContent    = p.verified_users;
+      document.getElementById('pNewWeek').textContent     = p.new_this_week;
+      document.getElementById('pNewMonth').textContent    = `${p.new_this_month} this month`;
+
+      // Revenue
+      const r = data.revenue;
+      document.getElementById('rFees').textContent       = fmt(r.total_fees_collected);
+      document.getElementById('rWithdrawn').textContent  = fmt(r.total_withdrawn);
+      document.getElementById('rPending').textContent    = fmt(r.pending_withdrawal_amount);
+      document.getElementById('rBonus').textContent      = fmt(r.total_bonus_paid);
+      document.getElementById('rBonusWeek').textContent  = `${fmt(r.bonus_paid_this_week)} this week`;
+      document.getElementById('rReferral').textContent   = fmt(r.total_referral_rewards);
+      document.getElementById('rReferralSub').textContent =
+        `${r.paid_referrals} paid · ${r.pending_referrals} pending`;
+
+      // Withdrawal status breakdown
+      renderStatusGrid(r.withdrawal_counts);
+
+      // Chart
+      renderChart(data.weekly_chart);
+
+      // Transactions
+      allTx = data.transactions;
+      renderTx('all');
+
+      document.getElementById('loadingState').classList.add('hidden-section');
+      document.getElementById('analyticsContent').classList.remove('hidden-section');
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    } catch {
+      document.getElementById('loadingState').classList.add('hidden-section');
+      document.getElementById('errorState').classList.remove('hidden-section');
+    }
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+    e.preventDefault();
+    const refresh = sessionStorage.getItem('refresh_token');
+    await fetch('/auth/logout', {
+      method: 'POST',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: refresh }),
+    });
+    sessionStorage.clear();
+    window.location.href = '/login';
+  });
+
+  loadAnalytics();
+
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+  setTimeout(() => {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }, 300);
+</script>
+</body>
+</html>

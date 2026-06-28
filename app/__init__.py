@@ -1,0 +1,1 @@
+# Nova Earns application package

@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Admin Dashboard – Nova Earns</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+
+  <link rel="stylesheet" href="/static/output.css" />
+  <script src="/static/lucide.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #09090B;
+      color: #FFFFFF;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #8B5CF6, #A855F7, #D946EF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7C3AED, #8B5CF6, #A855F7);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.30);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.45);
+    }
+    .btn-primary:active { transform: scale(0.96); }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s ease;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+    .btn-secondary:active { transform: scale(0.96); }
+
+    .admin-input {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(139, 92, 246, 0.20);
+      border-radius: 10px;
+      padding: 8px 12px;
+      width: 100%;
+      color: #FFFFFF;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    .admin-input:focus {
+      border-color: #8B5CF6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.20);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .admin-input::placeholder { color: #6B7280; }
+
+    .admin-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #9CA3AF;
+      margin-bottom: 2px;
+    }
+
+    .msg-error {
+      background: rgba(239, 68, 68, 0.10);
+      border: 1px solid rgba(239, 68, 68, 0.20);
+      color: #EF4444;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    .msg-success {
+      background: rgba(34, 197, 94, 0.10);
+      border: 1px solid rgba(34, 197, 94, 0.20);
+      color: #22C55E;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .admin-table th {
+      text-align: left;
+      padding: 6px 8px;
+      color: #9CA3AF;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .admin-table td {
+      padding: 8px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+    .admin-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+    .admin-table button {
+      background: transparent;
+      border: none;
+      color: #C4B5FD;
+      padding: 4px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin: 0 2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .admin-table button:hover { background: rgba(255,255,255,0.08); }
+
+    .admin-container { max-width: 1400px; margin: 0 auto; padding: 0 12px; }
+
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(139, 92, 246, 0.08);
+      padding: 8px 0;
+    }
+
+    .tap-target { min-height: 36px; min-width: 36px; }
+
+    ::-webkit-scrollbar { width: 0; height: 0; }
+    .hidden-section { display: none; }
+
+    .badge-status {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 500;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      white-space: nowrap;
+    }
+
+    /* ====== SIDEBAR LAYOUT ====== */
+    .app-shell {
+      display: flex;
+      min-height: calc(100vh - 53px);
+    }
+
+    .sidebar {
+      width: 64px;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.03);
+      border-right: 1px solid rgba(139, 92, 246, 0.10);
+      padding: 12px 8px;
+      position: sticky;
+      top: 53px;
+      height: calc(100vh - 53px);
+      overflow-y: auto;
+      transition: width 0.25s ease;
+      z-index: 30;
+    }
+    .sidebar.expanded { width: 220px; }
+
+    .sidebar-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      border: none;
+      color: #9CA3AF;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .sidebar-toggle:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .sidebar.expanded .sidebar-toggle { justify-content: flex-start; }
+
+    .sidebar-nav-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      margin-bottom: 4px;
+      border-radius: 10px;
+      background: transparent;
+      border: none;
+      color: #9CA3AF;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .sidebar-nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .sidebar-nav-item.active {
+      background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(168,85,247,0.18));
+      color: #fff;
+      box-shadow: inset 0 0 0 1px rgba(139,92,246,0.35);
+    }
+    .sidebar-nav-item .nav-label {
+      opacity: 0;
+      width: 0;
+      transition: opacity 0.2s ease;
+    }
+    .sidebar.expanded .sidebar-nav-item .nav-label {
+      opacity: 1;
+      width: auto;
+    }
+    .sidebar-nav-item i { flex-shrink: 0; }
+
+    .main-content { flex: 1; min-width: 0; padding: 16px 12px; }
+
+    .panel-view { display: none; }
+    .panel-view.active { display: block; animation: panelFadeIn 0.2s ease; }
+    @keyframes panelFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mobile sidebar becomes an overlay drawer */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 53px;
+        height: calc(100vh - 53px);
+        width: 64px;
+        z-index: 50;
+      }
+      .sidebar.expanded {
+        width: 200px;
+        box-shadow: 8px 0 24px rgba(0,0,0,0.5);
+      }
+      .main-content { padding-left: 12px; }
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        top: 53px;
+        background: rgba(0,0,0,0.5);
+        z-index: 45;
+      }
+      .sidebar-backdrop.active { display: block; }
+    }
+
+    /* ====== MODAL OVERLAY ====== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-box {
+      background: #14141A;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 20px;
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      animation: modalPop 0.18s ease;
+    }
+    .modal-box.modal-wide { max-width: 560px; }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.96) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: #9CA3AF;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 8px;
+      display: flex;
+      transition: 0.2s;
+    }
+    .modal-close-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+    .modal-body { padding: 16px 18px; }
+    .modal-footer {
+      padding: 14px 18px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== STICKY HEADER ====== -->
+  <header class="sticky-header admin-container flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center gap-2">
+      <span class="text-lg font-extrabold gradient-text">Nova Earns</span>
+      <span class="text-[9px] font-medium text-[#9CA3AF] bg-white/5 px-2 py-0.5 rounded-full">Admin</span>
+    </div>
+    <div class="flex items-center gap-3 text-sm flex-wrap">
+      <a href="/dashboard" class="text-[#9CA3AF] hover:text-white transition-colors tap-target flex items-center gap-1.5">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> <span class="hidden sm:inline">User Dashboard</span>
+      </a>
+      <a href="/survey-admin" class="text-[#9CA3AF] hover:text-white transition-colors tap-target flex items-center gap-1.5">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i> <span class="hidden sm:inline">Manage Surveys</span>
+      </a>
+      <a href="/admin-analytics" class="text-[#9CA3AF] hover:text-white transition-colors tap-target flex items-center gap-1.5">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> <span class="hidden sm:inline">Analytics</span>
+      </a>
+      <a href="#" id="logoutBtn" class="text-[#9CA3AF] hover:text-[#F87171] transition-colors tap-target flex items-center gap-1.5">
+        <i data-lucide="log-out" class="w-4 h-4"></i> <span class="hidden sm:inline">Logout</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <!-- ====== SIDEBAR ====== -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="closeMobileSidebar()"></div>
+    <aside id="sidebar" class="sidebar">
+      <button type="button" class="sidebar-toggle" onclick="toggleSidebar()" title="Expand menu">
+        <i data-lucide="panel-left" class="w-4 h-4"></i>
+        <span class="nav-label">Menu</span>
+      </button>
+      <button type="button" class="sidebar-nav-item active" data-panel="usersPanel" onclick="switchPanel('usersPanel', this)" title="Users">
+        <i data-lucide="users" class="w-4 h-4"></i><span class="nav-label">Users</span>
+      </button>
+      <button type="button" class="sidebar-nav-item" data-panel="withdrawalsPanel" onclick="switchPanel('withdrawalsPanel', this)" title="Withdrawals">
+        <i data-lucide="credit-card" class="w-4 h-4"></i><span class="nav-label">Withdrawals</span>
+      </button>
+      <button type="button" class="sidebar-nav-item" data-panel="announcementsPanel" onclick="switchPanel('announcementsPanel', this)" title="Announcements">
+        <i data-lucide="megaphone" class="w-4 h-4"></i><span class="nav-label">Announcements</span>
+      </button>
+      <button type="button" class="sidebar-nav-item" data-panel="bonusPanel" onclick="switchPanel('bonusPanel', this)" title="Daily Bonus">
+        <i data-lucide="gift" class="w-4 h-4"></i><span class="nav-label">Daily Bonus</span>
+      </button>
+      <button type="button" class="sidebar-nav-item" data-panel="referralPanel" onclick="switchPanel('referralPanel', this)" title="Referral Settings">
+        <i data-lucide="share-2" class="w-4 h-4"></i><span class="nav-label">Referral Settings</span>
+      </button>
+      <button type="button" class="sidebar-nav-item" data-panel="withdrawalSettingsPanel" onclick="switchPanel('withdrawalSettingsPanel', this)" title="Withdrawal Settings">
+        <i data-lucide="settings" class="w-4 h-4"></i><span class="nav-label">Withdrawal Settings</span>
+      </button>
+    </aside>
+
+    <main class="main-content">
+
+    <!-- ===================== USERS SECTION ===================== -->
+    <section id="usersPanel" class="panel-view active">
+    <div class="glass-card rounded-2xl p-3 md:p-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="users" class="w-4 h-4 text-[#8B5CF6]"></i> Users
+        </h2>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <div class="relative">
+            <i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#6B7280]"></i>
+            <input type="text" id="searchInput" placeholder="Search..." class="admin-input pl-8 w-36 md:w-48 text-sm">
+          </div>
+          <button onclick="loadUsers()" class="btn-secondary text-white font-medium px-3 py-1.5 rounded-lg text-xs tap-target flex items-center gap-1">
+            <i data-lucide="search" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Search</span>
+          </button>
+          <button onclick="showCreateForm()" class="btn-primary text-white font-medium px-3 py-1.5 rounded-lg text-xs tap-target flex items-center gap-1">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Create</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="usersTable" class="overflow-x-auto"></div>
+      <div id="pagination" class="mt-3 text-xs text-[#9CA3AF] flex items-center gap-2 flex-wrap"></div>
+    </div>
+    </section>
+
+    <!-- ===================== CREATE USER MODAL ===================== -->
+    <div id="createFormSection" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 class="text-base font-semibold text-white flex items-center gap-2">
+            <i data-lucide="user-plus" class="w-4 h-4 text-[#8B5CF6]"></i> Create User
+          </h3>
+          <button type="button" class="modal-close-btn" onclick="document.getElementById('createFormSection').classList.remove('active')"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <form id="createUserForm" class="modal-body grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div><input type="text" id="cu_username" placeholder="Username" required class="admin-input"></div>
+          <div><input type="email" id="cu_email" placeholder="Email" required class="admin-input"></div>
+          <div><input type="tel" id="cu_phone" placeholder="Phone" required class="admin-input"></div>
+          <div><input type="password" id="cu_password" placeholder="Password" required class="admin-input"></div>
+          <div>
+            <select id="cu_role" class="admin-input">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div id="cuError" class="msg-error col-span-2 hidden-section"></div>
+          <div class="flex items-center gap-3 col-span-2">
+            <button type="submit" class="btn-primary text-white font-semibold px-4 py-1.5 rounded-lg text-sm tap-target">Create</button>
+            <button type="button" onclick="document.getElementById('createFormSection').classList.remove('active')" class="btn-secondary text-white px-4 py-1.5 rounded-lg text-sm tap-target">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===================== EDIT USER MODAL ===================== -->
+    <div id="editUserSection" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 class="text-base font-semibold text-white flex items-center gap-2">
+            <i data-lucide="user-cog" class="w-4 h-4 text-[#8B5CF6]"></i> Edit User Details
+          </h3>
+          <button type="button" class="modal-close-btn" onclick="document.getElementById('editUserSection').classList.remove('active')"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <form id="editUserForm" class="modal-body grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input type="hidden" id="editUserId">
+          <div><label class="admin-label">Email</label><input type="email" id="editUserEmail" required class="admin-input"></div>
+          <div><label class="admin-label">Balance</label><input type="number" id="editUserBalance" min="0" step="0.01" required class="admin-input"></div>
+          <div id="editUserError" class="msg-error col-span-2 hidden-section"></div>
+          <div id="editUserSuccess" class="msg-success col-span-2 hidden-section"></div>
+          <div class="flex items-center gap-3 col-span-2">
+            <button type="submit" class="btn-primary text-white font-semibold px-4 py-1.5 rounded-lg text-sm tap-target">Save Changes</button>
+            <button type="button" onclick="document.getElementById('editUserSection').classList.remove('active')" class="btn-secondary text-white px-4 py-1.5 rounded-lg text-sm tap-target">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===================== DAILY BONUS PANEL ===================== -->
+    <section id="bonusPanel" class="panel-view">
+      <!-- Daily Bonus Settings -->
+      <section class="glass-card rounded-2xl p-4">
+        <h3 class="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+          <i data-lucide="gift" class="w-4 h-4 text-[#8B5CF6]"></i> Daily Bonus
+        </h3>
+        <form id="bonusSettingsForm" class="flex flex-col sm:flex-row items-end gap-2">
+          <div class="w-full sm:w-40">
+            <label class="admin-label">Amount</label>
+            <input type="number" id="bonusAmountInput" min="0" step="0.01" required class="admin-input">
+          </div>
+          <button type="submit" class="btn-primary text-white font-medium px-4 py-1.5 rounded-lg text-sm tap-target whitespace-nowrap">Save</button>
+          <div id="bonusSettingsError" class="msg-error hidden-section"></div>
+          <div id="bonusSettingsSuccess" class="msg-success hidden-section"></div>
+        </form>
+      </section>
+    </section>
+
+    <!-- ===================== REFERRAL SETTINGS PANEL ===================== -->
+    <section id="referralPanel" class="panel-view">
+      <section class="glass-card rounded-2xl p-4">
+        <h3 class="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+          <i data-lucide="share-2" class="w-4 h-4 text-[#8B5CF6]"></i> Referral Settings
+        </h3>
+        <form id="referralSettingsForm" class="flex flex-col sm:flex-row items-end gap-2">
+          <div class="w-full sm:w-32">
+            <label class="admin-label">Reward (₦)</label>
+            <input type="number" id="referralRewardAmount" min="0" step="0.01" required class="admin-input">
+          </div>
+          <div class="flex items-center gap-1.5">
+            <input type="checkbox" id="referralIsEnabled" class="w-3.5 h-3.5 accent-[#8B5CF6]">
+            <label for="referralIsEnabled" class="text-xs text-[#D1D5DB]">Enable</label>
+          </div>
+          <button type="submit" class="btn-primary text-white font-medium px-4 py-1.5 rounded-lg text-sm tap-target">Save</button>
+          <div id="referralSettingsError" class="msg-error hidden-section"></div>
+          <div id="referralSettingsSuccess" class="msg-success hidden-section"></div>
+        </form>
+      </section>
+    </section>
+
+    <!-- ===================== WITHDRAWAL SETTINGS PANEL ===================== -->
+    <section id="withdrawalSettingsPanel" class="panel-view">
+    <section class="glass-card rounded-2xl p-4">
+      <h3 class="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+        <i data-lucide="settings" class="w-4 h-4 text-[#8B5CF6]"></i> Withdrawal Settings
+      </h3>
+      <form id="withdrawalSettingsForm" class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div><label class="admin-label">Min Balance</label><input type="number" id="wsMinBalance" min="0" step="0.01" required class="admin-input"></div>
+        <div><label class="admin-label">Fee Amount</label><input type="number" id="wsFeeAmount" min="0" step="0.01" required class="admin-input"></div>
+        <div><label class="admin-label">Withdrawal Limit (per 48h)</label><input type="number" id="wsWithdrawalLimit" min="1" step="1" required class="admin-input"></div>
+        <div><label class="admin-label">Fee Bank</label><input type="text" id="wsFeeBankName" required class="admin-input"></div>
+        <div><label class="admin-label">Fee Account #</label><input type="text" id="wsFeeAccountNumber" required class="admin-input"></div>
+        <div class="col-span-2 md:col-span-4 flex items-center gap-3">
+          <div class="flex-1"><label class="admin-label">Fee Account Name</label><input type="text" id="wsFeeAccountName" required class="admin-input"></div>
+          <button type="submit" class="btn-primary text-white font-medium px-4 py-1.5 rounded-lg text-sm tap-target whitespace-nowrap mt-auto">Save Settings</button>
+        </div>
+        <div id="withdrawalSettingsError" class="msg-error col-span-4 hidden-section"></div>
+        <div id="withdrawalSettingsSuccess" class="msg-success col-span-4 hidden-section"></div>
+      </form>
+    </section>
+    </section>
+
+    <!-- ===================== ANNOUNCEMENTS PANEL ===================== -->
+    <section id="announcementsPanel" class="panel-view">
+    <section class="glass-card rounded-2xl p-4">
+      <h3 class="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+        <i data-lucide="megaphone" class="w-4 h-4 text-[#8B5CF6]"></i> Announcements
+      </h3>
+      <form id="announcementForm" class="space-y-2">
+        <input type="text" id="annTitle" placeholder="Title" required class="admin-input">
+        <textarea id="annMessage" placeholder="Message..." required rows="2" class="admin-input resize-none"></textarea>
+        <button type="submit" class="btn-primary text-white font-medium px-4 py-1.5 rounded-lg text-sm tap-target">Post</button>
+        <div id="annError" class="msg-error hidden-section"></div>
+        <div id="annSuccess" class="msg-success hidden-section"></div>
+      </form>
+      <div id="announcementsList" class="mt-3 space-y-2"></div>
+    </section>
+    </section>
+
+    <!-- ===================== WITHDRAWALS PANEL ===================== -->
+    <section id="withdrawalsPanel" class="panel-view">
+    <section class="glass-card rounded-2xl p-3 md:p-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="credit-card" class="w-4 h-4 text-[#8B5CF6]"></i> Withdrawals
+        </h2>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <select id="withdrawalStatusFilter" class="admin-input w-32 text-xs">
+            <option value="">All</option>
+            <option value="pending_payment">Pending Payment</option>
+            <option value="pending_verification">Pending Verification</option>
+            <option value="processing">Processing</option>
+            <option value="completed">Completed</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <button onclick="loadWithdrawals()" class="btn-secondary text-white font-medium px-3 py-1.5 rounded-lg text-xs tap-target flex items-center gap-1">
+            <i data-lucide="filter" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Filter</span>
+          </button>
+        </div>
+      </div>
+      <div id="withdrawalsTable" class="overflow-x-auto"></div>
+      <div id="withdrawalsPagination" class="mt-3 text-xs text-[#9CA3AF] flex items-center gap-2 flex-wrap"></div>
+    </section>
+    </section>
+
+    <!-- ===================== PROOF OF PAYMENT MODAL ===================== -->
+    <div id="proofImageSection" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+      <div class="modal-box modal-wide">
+        <div class="modal-header">
+          <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+            <i data-lucide="image" class="w-4 h-4 text-[#8B5CF6]"></i> Proof of Payment
+          </h3>
+          <button type="button" class="modal-close-btn" onclick="document.getElementById('proofImageSection').classList.remove('active')"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="modal-body">
+          <img id="proofImage" src="" alt="Proof" class="w-full max-h-[60vh] object-contain rounded-xl border border-white/10">
+          <div id="proofActionError" class="msg-error mt-2 hidden-section"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="verifyWithdrawalBtn" class="btn-primary text-white font-medium px-4 py-1.5 rounded-lg text-sm tap-target flex items-center gap-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i> Verify
+          </button>
+          <button type="button" id="rejectWithdrawalBtn" class="btn-secondary text-white font-medium px-4 py-1.5 rounded-lg text-sm tap-target flex items-center gap-1.5" style="background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.2);">
+            <i data-lucide="x" class="w-4 h-4"></i> Reject
+          </button>
+          <button type="button" onclick="document.getElementById('proofImageSection').classList.remove('active')" class="btn-secondary text-white px-4 py-1.5 rounded-lg text-sm tap-target">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== REJECT REASON MODAL ===================== -->
+    <div id="rejectReasonSection" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+            <i data-lucide="x-circle" class="w-4 h-4 text-[#EF4444]"></i> Reject Withdrawal
+          </h3>
+          <button type="button" class="modal-close-btn" onclick="document.getElementById('rejectReasonSection').classList.remove('active')"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <form id="rejectReasonForm" class="modal-body space-y-2">
+          <input type="hidden" id="rejectWithdrawalId">
+          <textarea id="rejectReasonInput" placeholder="Reason for rejection" required rows="3" class="admin-input resize-none"></textarea>
+          <div id="rejectReasonError" class="msg-error hidden-section"></div>
+          <div class="flex gap-2">
+            <button type="submit" class="btn-primary text-white font-medium px-4 py-1.5 rounded-lg text-sm tap-target" style="background:linear-gradient(135deg,#EF4444,#DC2626);">Confirm</button>
+            <button type="button" onclick="document.getElementById('rejectReasonSection').classList.remove('active')" class="btn-secondary text-white px-4 py-1.5 rounded-lg text-sm tap-target">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===================== NOTIFY USER MODAL ===================== -->
+    <div id="notifyFormSection" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+            <i data-lucide="bell" class="w-4 h-4 text-[#8B5CF6]"></i> Notify <span id="notifyUsername" class="text-[#C4B5FD]"></span>
+          </h3>
+          <button type="button" class="modal-close-btn" onclick="document.getElementById('notifyFormSection').classList.remove('active')"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <form id="notifyForm" class="modal-body space-y-2">
+          <input type="hidden" id="notifyUserId">
+          <input type="text" id="notifyTitle" placeholder="Title" required class="admin-input">
+          <textarea id="notifyMessage" placeholder="Message" required rows="3" class="admin-input resize-none"></textarea>
+          <div class="flex items-center gap-1.5">
+            <input type="checkbox" id="notifySendEmail" class="w-3.5 h-3.5 accent-[#8B5CF6]">
+            <label for="notifySendEmail" class="text-xs text-[#D1D5DB]">Also send by email</label>
+          </div>
+          <div id="notifyError" class="msg-error hidden-section"></div>
+          <div id="notifySuccess" class="msg-success hidden-section"></div>
+          <div class="flex gap-2">
+            <button type="submit" class="btn-primary text-white font-medium px-4 py-1.5 rounded-lg text-sm tap-target">Send</button>
+            <button type="button" onclick="document.getElementById('notifyFormSection').classList.remove('active')" class="btn-secondary text-white px-4 py-1.5 rounded-lg text-sm tap-target">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    </main>
+  </div>
+
+  <!-- ====== JAVASCRIPT (100% PRESERVED - only UI strings modified) ====== -->
+  <script>
+    const token = sessionStorage.getItem('access_token');
+    if (!token) window.location.href = '/login';
+
+    let currentPage = 1;
+
+    function authHeaders() {
+      return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+    }
+
+    // ---- SIDEBAR / PANEL NAVIGATION ----
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      sb.classList.toggle('expanded');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (window.innerWidth <= 768) {
+        backdrop.classList.toggle('active', sb.classList.contains('expanded'));
+      }
+    }
+
+    function closeMobileSidebar() {
+      document.getElementById('sidebar').classList.remove('expanded');
+      document.getElementById('sidebarBackdrop').classList.remove('active');
+    }
+
+    function switchPanel(panelId, btn) {
+      document.querySelectorAll('.panel-view').forEach(p => p.classList.remove('active'));
+      document.getElementById(panelId).classList.add('active');
+      document.querySelectorAll('.sidebar-nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (window.innerWidth <= 768) closeMobileSidebar();
+    }
+
+    // ---- MODAL HELPERS ----
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+      }
+    });
+
+    async function loadBonusSettings() {
+      const res = await fetch('/admin/bonus', { headers: authHeaders() });
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('bonusAmountInput').value = data.bonus_amount ?? 0;
+    }
+
+    async function loadReferralSettings() {
+      const res = await fetch('/admin/referral-settings', { headers: authHeaders() });
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('referralRewardAmount').value = data.reward_amount ?? 0;
+      document.getElementById('referralIsEnabled').checked = data.is_enabled ?? true;
+    }
+
+    async function loadAnnouncements() {
+      const res = await fetch('/admin/announcements', { headers: authHeaders() });
+      if (!res.ok) return;
+      const data = await res.json();
+      const el = document.getElementById('announcementsList');
+      if (!data.length) { el.innerHTML = '<p class="text-xs text-[#6B7280]">No announcements yet.</p>'; return; }
+      el.innerHTML = data.map(a => `
+        <div class="glass-card rounded-xl p-2 flex flex-wrap items-start justify-between gap-2">
+          <div class="flex-1 min-w-0">
+            <strong class="text-sm text-white">${escHtml(a.title)}</strong>
+            <p class="text-xs text-[#D1D5DB] mt-0.5">${escHtml(a.message)}</p>
+            <small class="text-[10px] text-[#9CA3AF]">${new Date(a.created_at).toLocaleString()}</small>
+          </div>
+          <button type="button" onclick="deleteAnnouncement(${a.id})" class="text-[#EF4444] hover:text-[#F87171] transition-colors tap-target p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    async function deleteAnnouncement(id) {
+      if (!confirm('Delete this announcement?')) return;
+      await fetch(`/admin/announcements/${id}`, { method: 'DELETE', headers: authHeaders() });
+      loadAnnouncements();
+    }
+
+    document.getElementById('announcementForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('annError');
+      const sucEl = document.getElementById('annSuccess');
+      errEl.style.display = 'none';
+      sucEl.style.display = 'none';
+
+      const payload = {
+        title: document.getElementById('annTitle').value.trim(),
+        message: document.getElementById('annMessage').value.trim(),
+      };
+      const res = await fetch('/admin/announcements', {
+        method: 'POST', headers: authHeaders(), body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.detail || 'Failed.'; errEl.style.display = 'block'; return; }
+      sucEl.textContent = 'Announcement posted.';
+      sucEl.style.display = 'block';
+      document.getElementById('annTitle').value = '';
+      document.getElementById('annMessage').value = '';
+      loadAnnouncements();
+    });
+
+    async function loadWithdrawalSettings() {
+      const res = await fetch('/admin/withdrawal-settings', { headers: authHeaders() });
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('wsMinBalance').value = data.min_balance ?? 0;
+      document.getElementById('wsFeeAmount').value = data.fee_amount ?? 0;
+      document.getElementById('wsFeeBankName').value = data.fee_bank_name ?? '';
+      document.getElementById('wsFeeAccountNumber').value = data.fee_account_number ?? '';
+      document.getElementById('wsFeeAccountName').value = data.fee_account_name ?? '';
+      document.getElementById('wsWithdrawalLimit').value = data.daily_withdrawal_limit ?? 1;
+    }
+
+    let currentWithdrawalsPage = 1;
+
+    function formatWithdrawalStatus(status) {
+      const labels = {
+        pending_payment: 'Pending Payment',
+        pending_verification: 'Pending Verification',
+        processing: 'Processing',
+        completed: 'Completed',
+        rejected: 'Rejected',
+      };
+      return labels[status] || status;
+    }
+
+    async function loadWithdrawals(page = 1) {
+      currentWithdrawalsPage = page;
+      const statusFilter = document.getElementById('withdrawalStatusFilter').value;
+      let url = `/admin/withdrawals?page=${page}&page_size=20`;
+      if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
+
+      const res = await fetch(url, { headers: authHeaders() });
+      if (res.status === 401 || res.status === 403) { window.location.href = '/login'; return; }
+      const data = await res.json();
+
+      let html = `<table class="admin-table w-full text-xs">
+        <thead><tr>
+          <th class="p-1.5 font-medium">ID</th>
+          <th class="p-1.5 font-medium">User</th>
+          <th class="p-1.5 font-medium">Amount</th>
+          <th class="p-1.5 font-medium">Fee</th>
+          <th class="p-1.5 font-medium">Bank Details</th>
+          <th class="p-1.5 font-medium">Status</th>
+          <th class="p-1.5 font-medium text-center">Actions</th>
+        </tr></thead><tbody>`;
+      for (const w of data.withdrawals) {
+        html += `<tr class="border-b border-white/5 hover:bg-white/5 transition">
+          <td class="p-1.5 font-mono">${w.id}</td>
+          <td class="p-1.5 font-medium">${w.user_id ?? 'N/A'}</td>
+          <td class="p-1.5 font-medium text-[#22C55E]">${formatBalance(w.amount)}</td>
+          <td class="p-1.5">${formatBalance(w.fee_amount)}</td>
+          <td class="p-1.5 text-[#D1D5DB] leading-tight">
+            ${escHtml(w.bank_name)}<br>${escHtml(w.account_number)}<br>${escHtml(w.account_name)}
+          </td>
+          <td class="p-1.5">
+            <span class="badge-status">${formatWithdrawalStatus(w.status)}</span>
+          </td>
+          <td class="p-1.5 text-center">
+            <div class="flex items-center justify-center gap-0.5">
+              ${w.status === 'pending_verification' ? `<button title="View Proof" onclick="viewProof(${w.id})" class="p-1 rounded hover:bg-white/10 transition"><i data-lucide="image" class="w-4 h-4 text-[#8B5CF6]"></i></button>` : ''}
+              ${w.status === 'processing' ? `<button title="Mark Complete" onclick="completeWithdrawal(${w.id})" class="p-1 rounded hover:bg-white/10 transition"><i data-lucide="check-circle" class="w-4 h-4 text-[#22C55E]"></i></button>` : ''}
+            </div>
+          </td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+      document.getElementById('withdrawalsTable').innerHTML = html;
+
+      const totalPages = Math.ceil(data.total / 20);
+      let pag = `Page ${currentWithdrawalsPage} of ${totalPages} &nbsp;`;
+      if (currentWithdrawalsPage > 1) pag += `<button onclick="loadWithdrawals(${currentWithdrawalsPage - 1})" class="btn-secondary text-white px-2 py-0.5 rounded text-xs">Prev</button> `;
+      if (currentWithdrawalsPage < totalPages) pag += `<button onclick="loadWithdrawals(${currentWithdrawalsPage + 1})" class="btn-secondary text-white px-2 py-0.5 rounded text-xs">Next</button>`;
+      document.getElementById('withdrawalsPagination').innerHTML = pag;
+      lucide.createIcons();
+    }
+
+    let currentProofWithdrawalId = null;
+    // currentProofObjectUrl removed — proof images are now base64 data-URIs from the DB, not blob URLs.
+
+    async function viewProof(withdrawalId) {
+      currentProofWithdrawalId = withdrawalId;
+      const errEl = document.getElementById('proofActionError');
+      errEl.style.display = 'none';
+
+      // No object URLs to revoke — the image is now a base64 data-URI from the DB.
+      // Clear any previously displayed image while the new one loads.
+      document.getElementById('proofImage').src = '';
+
+      try {
+        const res = await fetch(`/admin/withdrawals/${withdrawalId}/proof-image`, { headers: authHeaders() });
+        if (!res.ok) {
+          errEl.textContent = 'Unable to load proof of payment image.';
+          errEl.style.display = 'block';
+          return;
+        }
+        // The endpoint now returns JSON: { "data_uri": "data:image/jpeg;base64,..." }
+        const json = await res.json();
+        if (!json.data_uri) {
+          errEl.textContent = 'No proof image found for this withdrawal.';
+          errEl.style.display = 'block';
+          return;
+        }
+        document.getElementById('proofImage').src = json.data_uri;
+        document.getElementById('proofImageSection').classList.add('active');
+      } catch (err) {
+        errEl.textContent = 'Unable to load proof of payment image.';
+        errEl.style.display = 'block';
+      }
+    }
+
+    document.getElementById('verifyWithdrawalBtn').addEventListener('click', async function() {
+      const errEl = document.getElementById('proofActionError');
+      errEl.style.display = 'none';
+      const res = await fetch(`/admin/withdrawals/${currentProofWithdrawalId}/verify`, { method: 'PATCH', headers: authHeaders() });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.detail; errEl.style.display = 'block'; return; }
+      document.getElementById('proofImageSection').classList.remove('active');
+      loadWithdrawals(currentWithdrawalsPage);
+    });
+
+    document.getElementById('rejectWithdrawalBtn').addEventListener('click', function() {
+      document.getElementById('rejectWithdrawalId').value = currentProofWithdrawalId;
+      document.getElementById('rejectReasonInput').value = '';
+      document.getElementById('rejectReasonError').style.display = 'none';
+      document.getElementById('proofImageSection').classList.remove('active');
+      document.getElementById('rejectReasonSection').classList.add('active');
+    });
+
+    document.getElementById('rejectReasonForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('rejectReasonError');
+      errEl.style.display = 'none';
+      const withdrawalId = document.getElementById('rejectWithdrawalId').value;
+      const payload = { reason: document.getElementById('rejectReasonInput').value.trim() };
+
+      const res = await fetch(`/admin/withdrawals/${withdrawalId}/reject`, {
+        method: 'PATCH', headers: authHeaders(), body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.detail; errEl.style.display = 'block'; return; }
+      document.getElementById('rejectReasonSection').classList.remove('active');
+      loadWithdrawals(currentWithdrawalsPage);
+    });
+
+    async function completeWithdrawal(withdrawalId) {
+      if (!confirm('Mark this withdrawal as completed?')) return;
+      await fetch(`/admin/withdrawals/${withdrawalId}/complete`, { method: 'PATCH', headers: authHeaders() });
+      loadWithdrawals(currentWithdrawalsPage);
+    }
+
+    document.getElementById('withdrawalSettingsForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('withdrawalSettingsError');
+      const sucEl = document.getElementById('withdrawalSettingsSuccess');
+      errEl.style.display = 'none';
+      sucEl.style.display = 'none';
+      const payload = {
+        min_balance: Number(document.getElementById('wsMinBalance').value),
+        fee_amount: Number(document.getElementById('wsFeeAmount').value),
+        fee_bank_name: document.getElementById('wsFeeBankName').value.trim(),
+        fee_account_number: document.getElementById('wsFeeAccountNumber').value.trim(),
+        fee_account_name: document.getElementById('wsFeeAccountName').value.trim(),
+        daily_withdrawal_limit: Number(document.getElementById('wsWithdrawalLimit').value),  // ← add this
+        };
+      const res = await fetch('/admin/withdrawal-settings', { method: 'PUT', headers: authHeaders(), body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.detail; errEl.style.display = 'block'; return; }
+      sucEl.textContent = 'Withdrawal settings saved.';
+      sucEl.style.display = 'block';
+    });
+
+    async function loadUsers(page = 1) {
+      currentPage = page;
+      const search = document.getElementById('searchInput').value.trim();
+      let url = `/admin/users?page=${page}&page_size=20`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+
+      const res = await fetch(url, { headers: authHeaders() });
+      if (res.status === 401 || res.status === 403) { window.location.href = '/login'; return; }
+      const data = await res.json();
+
+      let html = `<table class="admin-table w-full text-xs">
+        <thead><tr>
+          <th class="p-1.5 font-medium">ID</th>
+          <th class="p-1.5 font-medium">Username</th>
+          <th class="p-1.5 font-medium">Email</th>
+          <th class="p-1.5 font-medium">Balance</th>
+          <th class="p-1.5 font-medium">Role</th>
+          <th class="p-1.5 font-medium text-center">Actions</th>
+        </tr></thead><tbody>`;
+      for (const u of data.users) {
+        html += `<tr class="border-b border-white/5 hover:bg-white/5 transition">
+          <td class="p-1.5 font-mono">${u.id}</td>
+          <td class="p-1.5 font-medium">${escHtml(u.username)}</td>
+          <td class="p-1.5 text-[#D1D5DB]">${escHtml(u.email)}</td>
+          <td class="p-1.5 font-medium text-[#22C55E]">${formatBalance(u.balance)}</td>
+          <td class="p-1.5"><span class="badge-status">${u.role}</span></td>
+          <td class="p-1.5 text-center">
+            <div class="flex items-center justify-center gap-0.5">
+              <button title="Edit" onclick="handleEditUser(this)" data-user-id="${u.id}" data-user-email="${escHtml(u.email)}" data-user-balance="${String(u.balance ?? 0)}" class="p-1 rounded hover:bg-white/10 transition"><i data-lucide="pencil" class="w-4 h-4 text-[#8B5CF6]"></i></button>
+              ${u.is_suspended ? `<button title="Activate" onclick="activateUser(${u.id})" class="p-1 rounded hover:bg-white/10 transition"><i data-lucide="play-circle" class="w-4 h-4 text-[#22C55E]"></i></button>` : `<button title="Suspend" onclick="suspendUser(${u.id})" class="p-1 rounded hover:bg-white/10 transition"><i data-lucide="pause-circle" class="w-4 h-4 text-[#FACC15]"></i></button>`}
+              <button title="Delete" onclick="deleteUser(${u.id}, '${escHtml(u.username)}')" class="p-1 rounded hover:bg-white/10 transition"><i data-lucide="trash-2" class="w-4 h-4 text-[#EF4444]"></i></button>
+              <button title="Notify" onclick="openNotify(${u.id}, '${escHtml(u.username)}')" class="p-1 rounded hover:bg-white/10 transition"><i data-lucide="bell" class="w-4 h-4 text-[#A855F7]"></i></button>
+            </div>
+          </td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+      document.getElementById('usersTable').innerHTML = html;
+
+      const totalPages = Math.ceil(data.total / 20);
+      let pag = `Page ${currentPage} of ${totalPages} &nbsp;`;
+      if (currentPage > 1) pag += `<button onclick="loadUsers(${currentPage - 1})" class="btn-secondary text-white px-2 py-0.5 rounded text-xs">Prev</button> `;
+      if (currentPage < totalPages) pag += `<button onclick="loadUsers(${currentPage + 1})" class="btn-secondary text-white px-2 py-0.5 rounded text-xs">Next</button>`;
+      document.getElementById('pagination').innerHTML = pag;
+      lucide.createIcons();
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function handleEditUser(button) {
+      openEditUser(
+        button.getAttribute('data-user-id'),
+        button.getAttribute('data-user-email'),
+        button.getAttribute('data-user-balance')
+      );
+    }
+
+    function formatBalance(balance) {
+      const value = Number(balance ?? 0);
+      return `₦${value.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function openEditUser(userId, email, balance) {
+      document.getElementById('editUserId').value = userId;
+      document.getElementById('editUserEmail').value = email;
+      document.getElementById('editUserBalance').value = balance;
+      document.getElementById('editUserError').style.display = 'none';
+      document.getElementById('editUserSuccess').style.display = 'none';
+      document.getElementById('editUserSection').classList.add('active');
+    }
+
+    async function suspendUser(id) {
+      if (!confirm('Suspend this user?')) return;
+      await fetch(`/admin/users/${id}/suspend`, { method: 'PATCH', headers: authHeaders() });
+      loadUsers(currentPage);
+    }
+
+    async function activateUser(id) {
+      if (!confirm('Reactivate this user?')) return;
+      await fetch(`/admin/users/${id}/activate`, { method: 'PATCH', headers: authHeaders() });
+      loadUsers(currentPage);
+    }
+
+    async function deleteUser(id, name) {
+      if (!confirm(`Permanently delete user "${name}"?`)) return;
+      await fetch(`/admin/users/${id}`, { method: 'DELETE', headers: authHeaders() });
+      loadUsers(currentPage);
+    }
+
+    function showCreateForm() {
+      document.getElementById('createFormSection').classList.add('active');
+    }
+
+    document.getElementById('editUserForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('editUserError');
+      const sucEl = document.getElementById('editUserSuccess');
+      errEl.style.display = 'none';
+      sucEl.style.display = 'none';
+
+      const userId = document.getElementById('editUserId').value;
+      const payload = {
+        email: document.getElementById('editUserEmail').value.trim(),
+        balance: Number(document.getElementById('editUserBalance').value),
+      };
+
+      const res = await fetch(`/admin/users/${userId}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.detail; errEl.style.display = 'block'; return; }
+      sucEl.textContent = 'User updated successfully.';
+      sucEl.style.display = 'block';
+      document.getElementById('editUserSection').classList.remove('active');
+      loadUsers(currentPage);
+    });
+
+    document.getElementById('bonusSettingsForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('bonusSettingsError');
+      const sucEl = document.getElementById('bonusSettingsSuccess');
+      errEl.style.display = 'none';
+      sucEl.style.display = 'none';
+      const payload = { amount: Number(document.getElementById('bonusAmountInput').value) };
+      const res = await fetch('/admin/bonus', { method: 'PUT', headers: authHeaders(), body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.detail; errEl.style.display = 'block'; return; }
+      sucEl.textContent = 'Daily bonus amount saved.';
+      sucEl.style.display = 'block';
+    });
+
+    document.getElementById('referralSettingsForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('referralSettingsError');
+      const sucEl = document.getElementById('referralSettingsSuccess');
+      errEl.style.display = 'none';
+      sucEl.style.display = 'none';
+
+      const payload = {
+        reward_amount: Number(document.getElementById('referralRewardAmount').value),
+        is_enabled: document.getElementById('referralIsEnabled').checked,
+      };
+
+      const res = await fetch('/admin/referral-settings', {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        errEl.textContent = data.detail || 'Failed to save referral settings.';
+        errEl.style.display = 'block';
+        return;
+      }
+      sucEl.textContent = `Saved — Reward: ₦${Number(data.reward_amount).toFixed(2)}, Enabled: ${data.is_enabled}`;
+      sucEl.style.display = 'block';
+    });
+
+    document.getElementById('createUserForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('cuError');
+      errEl.style.display = 'none';
+      const payload = {
+        username: document.getElementById('cu_username').value.trim(),
+        email: document.getElementById('cu_email').value.trim(),
+        phone_number: document.getElementById('cu_phone').value.trim(),
+        password: document.getElementById('cu_password').value,
+        role: document.getElementById('cu_role').value,
+      };
+      const res = await fetch('/admin/users', { method: 'POST', headers: authHeaders(), body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.detail; errEl.style.display = 'block'; return; }
+      document.getElementById('createFormSection').classList.remove('active');
+      loadUsers(currentPage);
+    });
+
+    function openNotify(userId, username) {
+      document.getElementById('notifyUserId').value = userId;
+      document.getElementById('notifyUsername').textContent = username;
+      document.getElementById('notifyError').style.display = 'none';
+      document.getElementById('notifySuccess').style.display = 'none';
+      document.getElementById('notifyFormSection').classList.add('active');
+    }
+
+    document.getElementById('notifyForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const userId = document.getElementById('notifyUserId').value;
+      const errEl = document.getElementById('notifyError');
+      const sucEl = document.getElementById('notifySuccess');
+      errEl.style.display = 'none'; sucEl.style.display = 'none';
+
+      const payload = {
+        title: document.getElementById('notifyTitle').value.trim(),
+        message: document.getElementById('notifyMessage').value.trim(),
+        send_email: document.getElementById('notifySendEmail').checked,
+      };
+      const res = await fetch(`/admin/users/${userId}/notify`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.detail; errEl.style.display = 'block'; return; }
+      sucEl.textContent = 'Notification sent.';
+      sucEl.style.display = 'block';
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+      e.preventDefault();
+      const refresh = sessionStorage.getItem('refresh_token');
+      await fetch('/auth/logout', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ refresh_token: refresh }) });
+      sessionStorage.clear();
+      window.location.href = '/login';
+    });
+
+    // ---- INIT ----
+    loadUsers();
+    loadBonusSettings();
+    loadWithdrawalSettings();
+    loadWithdrawals();
+    loadReferralSettings();
+    loadAnnouncements();
+
+    // ---- LUCIDE ICONS ----
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 300);
+  </script>
+</body>
+</html>

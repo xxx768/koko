@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Surveys – Nova Earns</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+
+  <link rel="stylesheet" href="/static/output.css" />
+  <script src="/static/lucide.js"></script>
+
+  <style>
+    /* ----- base reset & theme (matches dashboard) ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #09090B;
+      color: #FFFFFF;
+      min-height: 100vh;
+      padding-bottom: 88px;
+      /* space for fixed bottom nav */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* glassmorphism */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    /* gradient buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #7C3AED, #8B5CF6, #A855F7);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.30);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.45);
+    }
+    .btn-primary:active {
+      transform: scale(0.96);
+    }
+    .btn-primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s ease;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.13);
+      transform: translateY(-1px);
+    }
+    .btn-secondary:active {
+      transform: scale(0.96);
+    }
+
+    /* sticky header */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(9, 9, 11, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(139, 92, 246, 0.08);
+    }
+
+    /* max-width container */
+    .app-container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* avatar ring */
+    .avatar-ring {
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25), 0 0 20px rgba(139, 92, 246, 0.10);
+    }
+
+    /* tap targets */
+    .tap-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* custom radio styling */
+    .survey-radio {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(139, 92, 246, 0.4);
+      border-radius: 50%;
+      outline: none;
+      transition: all 0.2s ease;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .survey-radio:checked {
+      border-color: #8B5CF6;
+      background-color: #8B5CF6;
+      box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+    }
+    .survey-radio:checked::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: white;
+    }
+    .survey-radio:focus-visible {
+      outline: 2px solid #A855F7;
+      outline-offset: 2px;
+    }
+
+    /* fade-in */
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* slide container */
+    .slide-container {
+      overflow: hidden;
+      border-radius: 12px;
+    }
+    .slide-track {
+      display: flex;
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: transform;
+    }
+    .slide-item {
+      flex: 0 0 100%;
+      padding: 4px 2px;
+    }
+
+    /* bottom nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      height: 72px;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(139, 92, 246, 0.10);
+      box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: stretch;
+      justify-content: space-around;
+      padding: 4px 6px 8px;
+      max-width: 480px;
+      margin: 0 auto;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+    }
+    @media (min-width: 480px) {
+      .bottom-nav {
+        padding: 4px 12px 8px;
+      }
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 6px 0;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      color: #6B7280;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      min-height: 52px;
+      min-width: 52px;
+      position: relative;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-item:hover {
+      color: #C4B5FD;
+    }
+    .nav-item.active {
+      color: #8B5CF6;
+    }
+    .nav-item.active .nav-icon {
+      color: #8B5CF6;
+    }
+    .nav-item .nav-icon {
+      width: 22px;
+      height: 22px;
+      transition: all 0.2s ease;
+      color: currentColor;
+    }
+    .nav-item.active .nav-icon {
+      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+    }
+    .nav-item-logout {
+      color: #6B7280;
+    }
+    .nav-item-logout:hover {
+      color: #F87171;
+    }
+    .nav-item-logout.active {
+      color: #EF4444;
+    }
+    .nav-item-logout.active .nav-icon {
+      color: #EF4444;
+    }
+
+    /* scrollbar hide */
+    ::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== STICKY HEADER ====== -->
+  <header class="sticky-header app-container w-full py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3 min-w-0">
+      <a href="/dashboard" class="tap-target flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors" aria-label="Back to Dashboard">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </a>
+      <h1 class="text-base font-semibold text-white truncate">Surveys</h1>
+    </div>
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white font-semibold text-xs avatar-ring">
+        <span id="avatarInitial" class="uppercase">U</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====== MAIN CONTENT ====== -->
+  <main class="app-container w-full pt-4 pb-6">
+
+    <p class="sr-only"><a href="/dashboard">Back to Dashboard</a></p>
+
+    <!-- message area for feedback -->
+    <div id="message" class="mb-4 text-sm font-medium text-center" style="margin-top:0;"></div>
+
+    <!-- surveys list container -->
+    <div id="surveysList" class="space-y-4">
+      <!-- surveys will be injected here -->
+    </div>
+
+  </main>
+
+  <!-- ====== FIXED BOTTOM NAVIGATION ====== -->
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <!-- Home -->
+    <a href="/dashboard" class="nav-item" aria-label="Home">
+      <i data-lucide="house" class="nav-icon"></i>
+      <span>Home</span>
+    </a>
+    <!-- Surveys (active) -->
+    <a href="/survey-user" class="nav-item active" aria-label="Surveys">
+      <i data-lucide="clipboard-list" class="nav-icon"></i>
+      <span>Surveys</span>
+    </a>
+    <!-- Insights -->
+    <a href="/insights" class="nav-item" aria-label="Insights">
+      <i data-lucide="bar-chart-3" class="nav-icon"></i>
+      <span>Insights</span>
+    </a>
+    <!-- Notifications -->
+    <a href="/notifications-page" class="nav-item" aria-label="Notifications">
+      <i data-lucide="bell" class="nav-icon"></i>
+      <span>Alerts</span>
+    </a>
+    <!-- Logout (preserves logoutBtn ID) -->
+    <a href="#" id="logoutBtn" class="nav-item nav-item-logout" aria-label="Logout">
+      <i data-lucide="log-out" class="nav-icon"></i>
+      <span>Logout</span>
+    </a>
+  </nav>
+
+  <!-- ====== JAVASCRIPT (preserved + sliding enhancements) ====== -->
+  <script>
+    const token = sessionStorage.getItem('access_token');
+    if (!token) window.location.href = '/login';
+
+    function authHeaders() {
+      return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+    }
+
+    // ----- load surveys with sliding UI -----
+    async function loadSurveys() {
+      const res = await fetch('/api/dashboard/surveys', { headers: authHeaders() });
+      const data = await res.json();
+      const list = document.getElementById('surveysList');
+      if (!data.length) {
+        list.innerHTML = `
+          <div class="glass-card rounded-2xl p-6 text-center">
+            <i data-lucide="clipboard-list" class="w-12 h-12 text-[#6B7280] mx-auto mb-3"></i>
+            <p class="text-[#9CA3AF] font-medium">No surveys available right now.</p>
+            <p class="text-xs text-[#6B7280] mt-1">Check back later for new opportunities.</p>
+          </div>
+        `;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        return;
+      }
+
+      // Build survey cards with sliding questions
+      list.innerHTML = data.map(s => {
+        const questions = s.questions || [];
+        const total = questions.length;
+        // If only one question, we can still use sliding but no nav needed; we'll show it normally.
+        // But we'll still use slide container for consistency.
+        return `
+          <div class="glass-card rounded-2xl p-5 transition-all hover:border-purple-500/30 survey-card" data-survey-id="${s.id}">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-bold text-white truncate">${s.title}</h3>
+                ${s.description ? `<p class="text-sm text-[#9CA3AF] mt-1 line-clamp-2">${s.description}</p>` : ''}
+              </div>
+              <span class="inline-flex items-center gap-1 bg-[#8B5CF6]/10 text-[#A855F7] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#8B5CF6]/20 whitespace-nowrap">
+                <i data-lucide="coins" class="w-3.5 h-3.5"></i>
+                ₦${Number(s.reward_amount || 0).toFixed(2)}
+              </span>
+            </div>
+
+            <form class="surveyForm mt-4" data-survey-id="${s.id}">
+              <!-- Slide container -->
+              <div class="slide-container">
+                <div class="slide-track" id="track-${s.id}">
+                  ${questions.map((q, idx) => `
+                    <div class="slide-item" data-index="${idx}">
+                      <fieldset class="bg-white/5 rounded-xl p-4 border border-white/5">
+                        <legend class="text-sm font-semibold text-white mb-3">${idx + 1}. ${q.prompt}</legend>
+                        <div class="space-y-2.5">
+                          ${(q.options || []).map((opt) => `
+                            <label class="flex items-center gap-3 text-sm text-[#D1D5DB] cursor-pointer hover:text-white transition-colors tap-target">
+                              <input type="radio" name="question_${q.id}" value="${opt.id}" required class="survey-radio">
+                              <span>${opt.label}</span>
+                            </label>
+                          `).join('')}
+                        </div>
+                      </fieldset>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+
+              <!-- Navigation & Submit controls -->
+              <div class="flex items-center justify-between mt-4 gap-2">
+                <div class="flex items-center gap-2">
+                  ${total > 1 ? `
+                    <button type="button" class="btn-secondary text-white text-xs font-semibold px-4 py-2 rounded-xl tap-target flex items-center gap-1 survey-prev" data-survey-id="${s.id}" disabled>
+                      <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                      Prev
+                    </button>
+                    <button type="button" class="btn-secondary text-white text-xs font-semibold px-4 py-2 rounded-xl tap-target flex items-center gap-1 survey-next" data-survey-id="${s.id}">
+                      Next
+                      <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                  ` : ''}
+                </div>
+                <span class="text-xs text-[#9CA3AF] font-medium" id="progress-${s.id}">
+                  ${total > 1 ? `1 / ${total}` : ''}
+                </span>
+                <button type="submit" class="btn-primary text-white font-semibold text-xs px-5 py-2.5 rounded-xl transition-all tap-target flex items-center gap-2 shadow-lg shadow-purple-500/25">
+                  <i data-lucide="send" class="w-4 h-4"></i>
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        `;
+      }).join('');
+
+      // ----- initialize sliding for each survey -----
+      document.querySelectorAll('.surveyForm').forEach(form => {
+        const surveyId = form.getAttribute('data-survey-id');
+        const track = document.getElementById(`track-${surveyId}`);
+        const slides = track ? track.querySelectorAll('.slide-item') : [];
+        const total = slides.length;
+        if (total <= 1) return;
+
+        let current = 0;
+        const prevBtn = form.querySelector('.survey-prev');
+        const nextBtn = form.querySelector('.survey-next');
+        const progress = document.getElementById(`progress-${surveyId}`);
+
+        function updateSlide(index) {
+          current = Math.max(0, Math.min(index, total - 1));
+          track.style.transform = `translateX(-${current * 100}%)`;
+          if (prevBtn) prevBtn.disabled = current === 0;
+          if (nextBtn) nextBtn.disabled = current === total - 1;
+          if (progress) progress.textContent = `${current + 1} / ${total}`;
+        }
+
+        if (prevBtn) {
+          prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            updateSlide(current - 1);
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            updateSlide(current + 1);
+          });
+        }
+
+        // Also support keyboard? not needed for mobile.
+        // Ensure the submit button always collects all radios from all slides.
+      });
+
+      // re-init icons
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+
+      // set avatar
+      setAvatar();
+    }
+
+    // ----- preserve submit handler (unchanged) -----
+    document.addEventListener('submit', async function(e) {
+      if (!e.target.classList.contains('surveyForm')) return;
+      e.preventDefault();
+      const form = e.target;
+      const surveyId = form.getAttribute('data-survey-id');
+      const answers = Array.from(form.querySelectorAll('input[type="radio"]:checked')).map((input) => ({
+        question_id: Number(input.name.replace('question_', '')),
+        option_id: Number(input.value),
+      }));
+      const res = await fetch(`/api/dashboard/surveys/${surveyId}/submit`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ answers })
+      });
+      const data = await res.json();
+      const messageEl = document.getElementById('message');
+      if (!res.ok) {
+        messageEl.innerHTML =
+          `<span class="text-[#EF4444] bg-red-500/10 px-4 py-2 rounded-xl border border-red-500/20 inline-block">${data.detail || 'Unable to submit survey.'}</span>`;
+        return;
+      }
+      messageEl.innerHTML =
+        `<span class="text-[#22C55E] bg-green-500/10 px-4 py-2 rounded-xl border border-green-500/20 inline-block">Survey submitted successfully.</span>`;
+      // Remove the survey card from DOM (hide it)
+      const card = form.closest('.survey-card');
+      if (card) card.style.display = 'none';
+    });
+
+    // ----- logout (preserved) -----
+    document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+      e.preventDefault();
+      const refresh = sessionStorage.getItem('refresh_token');
+      await fetch('/auth/logout', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refresh }),
+      });
+      sessionStorage.clear();
+      window.location.href = '/login';
+    });
+
+    // ----- helper: set avatar initial -----
+    async function setAvatar() {
+      try {
+        const res = await fetch('/api/dashboard', { headers: { 'Authorization': 'Bearer ' + token } });
+        if (res.ok) {
+          const data = await res.json();
+          const initial = document.getElementById('avatarInitial');
+          if (initial && data.username) {
+            initial.textContent = data.username.charAt(0).toUpperCase();
+          }
+        }
+      } catch (_) {}
+    }
+
+    // ----- load -----
+    loadSurveys();
+
+    // lucide icons init
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 300);
+  </script>
+
+</body>
+</html>

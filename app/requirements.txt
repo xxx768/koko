@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+alembic
+python-jose[cryptography]
+pwdlib[argon2]
+pydantic[email]
+pydantic-settings
+resend
+python-multipart
+aiosqlite
+asyncpg
+slowapi
+httpx
+jinja2
+aiofiles
