@@ -137,11 +137,12 @@ async def login_user(db: AsyncSession, data: LoginRequest) -> TokenResponse:
 
     # Status checks after password is validated (avoids leaking account existence via error order)
     if not user.is_verified:
-        raise ValueError("Please verify your email address before logging in.")
+        await _send_new_verification_code(db, user)
+        raise ValueError("UNVERIFIED_EMAIL")
     if user.is_suspended:
         raise ValueError("Your account has been suspended. Please contact support.")
     if not user.is_active:
-        raise ValueError("Your account is inactive.")
+        raise ValueError("Your account is inactive. Please contact support.")
 
     # Reset failed attempts on successful login
     user.failed_login_attempts = 0
@@ -159,6 +160,79 @@ async def login_user(db: AsyncSession, data: LoginRequest) -> TokenResponse:
         token_type="bearer",
     )
 
+
+## ---------------------------------------------
+## Password reset 
+## ---------------------------------------------
+async def request_password_reset(db: AsyncSession, email: str) -> None:
+    """Send a reset code. Silently succeeds even if email doesn't exist (prevents enumeration)."""
+    from app.models.password_reset_code import PasswordResetCode
+
+    user = await _get_user_by_email(db, email)
+    if not user:
+        return  # silent — don't reveal whether email exists
+
+    # Invalidate any existing unused codes
+    existing = await db.execute(
+        select(PasswordResetCode).where(
+            PasswordResetCode.user_id == user.id,
+            PasswordResetCode.used == False  # noqa: E712
+        )
+    )
+    for code in existing.scalars().all():
+        code.used = True
+
+    plain_code = generate_verification_code()
+    hashed = hash_verification_code(plain_code)
+    reset_code = PasswordResetCode(
+        user_id=user.id,
+        hashed_code=hashed,
+        expires_at=_utc_now() + timedelta(minutes=15),
+    )
+    db.add(reset_code)
+    await db.flush()
+
+    await email_service.send_notification_email(
+        to_email=user.email,
+        username=user.username,
+        title="Reset Your Password",
+        message=(
+            f"Your password reset code is: <strong style='font-size:24px;letter-spacing:6px'>{plain_code}</strong><br><br>"
+            "This code expires in <strong>15 minutes</strong>.<br>"
+            "If you did not request a password reset, please ignore this email."
+        ),
+    )
+
+
+async def reset_password(db: AsyncSession, email: str, code: str, new_password: str) -> None:
+    from app.models.password_reset_code import PasswordResetCode
+
+    user = await _get_user_by_email(db, email)
+    if not user:
+        raise ValueError("Invalid request.")
+
+    result = await db.execute(
+        select(PasswordResetCode)
+        .where(PasswordResetCode.user_id == user.id, PasswordResetCode.used == False)  # noqa: E712
+        .order_by(PasswordResetCode.created_at.desc())
+        .limit(1)
+    )
+    reset_code = result.scalar_one_or_none()
+
+    if not reset_code:
+        raise ValueError("No reset code found. Please request a new one.")
+    if _utc_now() > reset_code.expires_at.replace(tzinfo=timezone.utc):
+        raise ValueError("Reset code has expired. Please request a new one.")
+    if not verify_verification_code(code, reset_code.hashed_code):
+        raise ValueError("Invalid reset code.")
+
+    if not validate_password_strength(new_password):
+        raise ValueError(get_password_policy_message())
+
+    reset_code.used = True
+    user.hashed_password = hash_password(new_password)
+    user.failed_login_attempts = 0
+    user.locked_until = None
 
 # ---------------------------------------------------------------------------
 # Refresh token

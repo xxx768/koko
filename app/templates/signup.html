@@ -479,7 +479,7 @@
             <button type="button" class="btn-secondary text-white font-semibold py-2.5 px-6 rounded-xl transition-all tap-target flex items-center gap-2" id="step3Prev">
               <i data-lucide="chevron-left" class="w-4 h-4"></i> Back
             </button>
-            <button type="submit" class="btn-primary text-white font-semibold py-2.5 px-6 rounded-xl transition-all tap-target flex items-center gap-2">
+            <button type="submit" id="signupBtn" class="btn-primary text-white font-semibold py-2.5 px-6 rounded-xl transition-all tap-target flex items-center gap-2">
               <i data-lucide="user-plus" class="w-5 h-5"></i>
               Create Account
             </button>
@@ -723,9 +723,18 @@
       errorEl.style.display = 'none';
       successEl.style.display = 'none';
 
+      const signupBtn = document.getElementById('signupBtn');
+      signupBtn.disabled = true;
+      signupBtn.innerHTML = `
+          <i data-lucide="loader" class="w-5 h-5 animate-spin"></i>
+      `;
+
+      if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }     
+
       const password = document.getElementById('password').value;
       const confirm = document.getElementById('confirm_password').value;
-
       if (password !== confirm) {
         errorEl.textContent = 'Passwords do not match.';
         errorEl.style.display = 'block';
@@ -751,10 +760,16 @@
         });
         const data = await res.json();
         if (!res.ok) {
-          errorEl.textContent = data.detail || 'Registration failed.';
-          errorEl.style.display = 'block';
-          return;
-        }
+
+          signupBtn.disabled = false;
+          signupBtn.innerHTML = `
+              <i data-lucide="user-plus" class="w-5 h-5"></i>
+          
+          `;
+                errorEl.textContent = data.detail || 'Registration failed.';
+                errorEl.style.display = 'block';
+                return;
+              }
         successEl.textContent = data.message + ' Redirecting to verification...';
         successEl.style.display = 'block';
         sessionStorage.setItem('pending_email', payload.email);

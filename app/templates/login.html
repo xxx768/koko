@@ -253,7 +253,7 @@
           <div id="passwordMsg" class="field-error" style="display:none;"></div>
           <!-- Forgot Password -->
           <div class="text-right mt-1.5">
-            <a href="#" class="text-xs text-[#9CA3AF] hover:text-[#C4B5FD] transition-colors">Forgot Password?</a>
+            <a href="/forgot-password" class="text-xs text-[#9CA3AF] hover:text-[#C4B5FD] transition-colors">Forgot Password?</a>
           </div>
         </div>
 
@@ -261,7 +261,7 @@
         <div id="errorMsg" class="msg-error" style="display:none;"></div>
 
         <!-- Login Button -->
-        <button type="submit" class="btn-primary w-full text-white font-semibold py-3 rounded-xl transition-all tap-target flex items-center justify-center gap-2">
+        <button type="submit" id="loginBtn" class="btn-primary w-full text-white font-semibold py-3 rounded-xl transition-all tap-target flex items-center justify-center gap-2">
           <i data-lucide="log-in" class="w-5 h-5"></i>
           Login
         </button>
@@ -346,6 +346,17 @@
 
       const errorEl = document.getElementById('errorMsg');
       errorEl.style.display = 'none';
+      const loginBtn = document.getElementById('loginBtn');
+
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = `
+          <i data-lucide="loader" class="w-5 h-5 animate-spin"></i>
+          Signing in...
+      `;
+
+      if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+      }
 
       const payload = {
         email: document.getElementById('email').value.trim(),
@@ -360,8 +371,19 @@
         });
         const data = await res.json();
         if (!res.ok) {
-          errorEl.textContent = data.detail || 'Login failed.';
-          errorEl.style.display = 'block';
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = `
+              <i data-lucide="log-in" class="w-5 h-5"></i>
+              Login
+          `;
+          lucide.createIcons();
+          if (data.detail === 'UNVERIFIED_EMAIL') {
+            sessionStorage.setItem('pending_email', payload.email);
+            window.location.href = '/verify-email';
+            return;
+        }
+        errorEl.textContent = data.detail || 'Login failed.';
+        errorEl.style.display = 'block';
           return;
         }
         sessionStorage.setItem('access_token', data.access_token);

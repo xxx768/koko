@@ -16,6 +16,12 @@ from app.schemas.auth import (
     VerifyEmailRequest,
 )
 from app.services import auth_service
+from app.schemas.auth import ForgotPasswordRequest, ResetPasswordRequest
+
+# from slowapi import Limiter
+# from slowapi.util import get_remote_address
+
+# limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 logger = logging.getLogger(__name__)
@@ -61,6 +67,24 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
         return await auth_service.login_user(db, data)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc))
+    
+@router.post("/forgot-password", status_code=status.HTTP_200_OK)
+# @limiter.limit("3/minute")
+async def forgot_password(request: Request, data: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)):
+    """Send a 5-digit password reset code to the user's email."""
+    await auth_service.request_password_reset(db, data.email)
+    return {"message": "If an account with that email exists, a reset code has been sent."}
+
+
+@router.post("/reset-password", status_code=status.HTTP_200_OK)
+# @limiter.limit("5/minute")
+async def reset_password(request: Request, data: ResetPasswordRequest, db: AsyncSession = Depends(get_db)):
+    """Reset password using the emailed code."""
+    try:
+        await auth_service.reset_password(db, data.email, data.code, data.new_password)
+        return {"message": "Password reset successfully. You can now log in."}
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 
 @router.post("/refresh-token", response_model=TokenResponse, status_code=status.HTTP_200_OK)

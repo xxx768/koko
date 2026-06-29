@@ -147,6 +147,10 @@ async def signup_page():
 async def verify_email_page():
     return FileResponse(TEMPLATE_DIR / "verify_email.html")
 
+@app.get("/forgot-password", include_in_schema=False)
+async def forgot_password_page():
+    return FileResponse(TEMPLATE_DIR / "forgot_password.html")
+
 
 @app.get("/dashboard", include_in_schema=False)
 async def dashboard_page():

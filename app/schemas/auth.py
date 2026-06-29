@@ -42,3 +42,22 @@ class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class VerifyResetCodeRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(..., min_length=5, max_length=5, pattern=r"^\d{5}$")
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(..., min_length=5, max_length=5, pattern=r"^\d{5}$")
+    new_password: str = Field(..., min_length=8, max_length=128)
+    confirm_password: str = Field(..., min_length=8, max_length=128)
+
+    @model_validator(mode="after")
+    def passwords_match(self) -> "ResetPasswordRequest":
+        if self.new_password != self.confirm_password:
+            raise ValueError("Passwords do not match.")
+        return self

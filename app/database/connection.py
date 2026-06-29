@@ -29,7 +29,8 @@ async def init_db() -> None:
         withdrawal,
         withdrawal_setting,
         referral,
-        announcement,       
+        announcement, 
+        password_reset_code,      
     )
 
     async with engine.begin() as conn:
