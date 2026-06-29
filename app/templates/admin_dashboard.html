@@ -336,6 +336,10 @@
       gap: 8px;
       flex-wrap: wrap;
     }
+    #withdrawalStatusFilter option {
+      background-color: #1F2937;
+      color: #D1D5DB;
+    }
   </style>
 </head>
 <body>
@@ -558,7 +562,7 @@
           <i data-lucide="credit-card" class="w-4 h-4 text-[#8B5CF6]"></i> Withdrawals
         </h2>
         <div class="flex flex-wrap items-center gap-1.5">
-          <select id="withdrawalStatusFilter" class="admin-input w-32 text-xs">
+          <select id="withdrawalStatusFilter" class="admin-input w-32 text-xs text-[#D1D5DB] bg-[#1F2937]">
             <option value="">All</option>
             <option value="pending_payment">Pending Payment</option>
             <option value="pending_verification">Pending Verification</option>
@@ -796,7 +800,7 @@
       let html = `<table class="admin-table w-full text-xs">
         <thead><tr>
           <th class="p-1.5 font-medium">ID</th>
-          <th class="p-1.5 font-medium">User</th>
+          <th class="p-1.5 font-medium">Date</th>
           <th class="p-1.5 font-medium">Amount</th>
           <th class="p-1.5 font-medium">Fee</th>
           <th class="p-1.5 font-medium">Bank Details</th>
@@ -806,7 +810,7 @@
       for (const w of data.withdrawals) {
         html += `<tr class="border-b border-white/5 hover:bg-white/5 transition">
           <td class="p-1.5 font-mono">${w.id}</td>
-          <td class="p-1.5 font-medium">${w.user_id ?? 'N/A'}</td>
+          <td class="p-1.5 font-medium">${w.created_at ?? 'N/A'}</td>
           <td class="p-1.5 font-medium text-[#22C55E]">${formatBalance(w.amount)}</td>
           <td class="p-1.5">${formatBalance(w.fee_amount)}</td>
           <td class="p-1.5 text-[#D1D5DB] leading-tight">
@@ -817,8 +821,8 @@
           </td>
           <td class="p-1.5 text-center">
             <div class="flex items-center justify-center gap-0.5">
-              ${w.status === 'pending_verification' ? `<button title="View Proof" onclick="viewProof(${w.id})" class="p-1 rounded hover:bg-white/10 transition"><i data-lucide="image" class="w-4 h-4 text-[#8B5CF6]"></i></button>` : ''}
-              ${w.status === 'processing' ? `<button title="Mark Complete" onclick="completeWithdrawal(${w.id})" class="p-1 rounded hover:bg-white/10 transition"><i data-lucide="check-circle" class="w-4 h-4 text-[#22C55E]"></i></button>` : ''}
+              ${w.status === 'pending_verification' ? `<button title="View Proof" onclick="viewProof(${w.id})" class="p-1 rounded hover:bg-white/10 transition"><i data-lucide="image" class="w-4 h-4 text-[#8B5CF6]"></i>View Proof</button>` : ''}
+              ${w.status === 'processing' ? `<button title="Mark Complete" onclick="completeWithdrawal(${w.id})" class="p-1 rounded hover:bg-white/10 transition"><i data-lucide="check-circle" class="w-4 h-4 text-[#22C55E]"></i>Mark as Completed</button>` : ''}
             </div>
           </td>
         </tr>`;

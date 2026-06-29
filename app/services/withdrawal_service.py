@@ -48,6 +48,8 @@ from app.schemas.withdrawal import (
     WithdrawalSettingUpdateRequest,
 )
 
+from app.services.email_service import send_notification_email
+
 # ---------------------------------------------------------------------------
 # Proof-image validation constants
 # ---------------------------------------------------------------------------
@@ -206,7 +208,9 @@ async def create_withdrawal_request(
     # 48-hour limit check
     count, oldest = await _count_withdrawals_last_48h(db, user.id)
     if count >= setting.daily_withdrawal_limit:
-        reset_at = oldest + timedelta(hours=48)
+        # reset_at = oldest + timedelta(hours=48)
+        oldest_aware = oldest.replace(tzinfo=timezone.utc) if oldest.tzinfo is None else oldest
+        reset_at = oldest_aware + timedelta(hours=48)
         now = datetime.now(timezone.utc)
         remaining = reset_at - now
         hours, remainder = divmod(int(remaining.total_seconds()), 3600)
@@ -231,38 +235,6 @@ async def create_withdrawal_request(
     db.add(request)
     await db.flush()
     return request
-
-# async def create_withdrawal_request(
-#     db: AsyncSession, user: User, data: WithdrawalCreateRequest
-# ) -> WithdrawalRequest:
-#     setting = await get_or_create_setting(db)
-
-#     if await get_active_withdrawal(db, user.id):
-#         raise ValueError("You already have a withdrawal request in progress.")
-
-#     if float(user.balance) < float(setting.min_balance):
-#         raise ValueError(
-#             f"Your balance must be at least ₦{float(setting.min_balance):,.2f} to request a withdrawal."
-#         )
-
-#     if float(data.amount) > float(user.balance):
-#         raise ValueError("Withdrawal amount cannot exceed your balance.")
-
-#     user.balance = float(user.balance) - float(data.amount)
-
-#     request = WithdrawalRequest(
-#         user_id=user.id,
-#         amount=data.amount,
-#         bank_name=data.bank_name,
-#         account_number=data.account_number,
-#         account_name=data.account_name,
-#         fee_amount=setting.fee_amount,
-#         status=WithdrawalStatus.pending_payment,
-#     )
-#     db.add(request)
-#     await db.flush()
-#     return request
-
 
 async def get_user_withdrawal(
     db: AsyncSession, user_id: int, withdrawal_id: int
@@ -400,6 +372,19 @@ async def verify_withdrawal(
         from app.services.referral_service import process_referral_reward_on_withdrawal
         await process_referral_reward_on_withdrawal(db, user)
 
+    if user:
+        from app.services.referral_service import process_referral_reward_on_withdrawal
+        await process_referral_reward_on_withdrawal(db, user)
+        await send_notification_email(
+            to_email=user.email,
+            username=user.username,
+            title="Withdrawal Fee Verified",
+            message=(
+                f"Your withdrawal fee payment for ₦{float(request.amount):,.2f} has been verified. "
+                "Your withdrawal is now being processed. You will be notified once the payout is complete."
+            ),
+        )
+
     return request
 
 
@@ -422,6 +407,18 @@ async def reject_withdrawal(
     # Delete the proof image now that admin has made a decision.
     _clear_proof(request)
 
+    if user:
+        await send_notification_email(
+            to_email=user.email,
+            username=user.username,
+            title="Withdrawal Request Rejected",
+            message=(
+                f"Your withdrawal request for ₦{float(request.amount):,.2f} has been rejected. "
+                f"Reason: {reason}. "
+                "Your balance has been refunded. Please contact support if you have any questions."
+            ),
+        )
+
     return request
 
 
@@ -433,4 +430,17 @@ async def complete_withdrawal(
         raise ValueError("This withdrawal is not in processing status.")
     request.status = WithdrawalStatus.completed
     request.completed_at = datetime.now(timezone.utc)
+
+    user = await db.get(User, request.user_id)
+    if user:
+        await send_notification_email(
+            to_email=user.email,
+            username=user.username,
+            title="Withdrawal Completed",
+            message=(
+                f"Your withdrawal request of ₦{float(request.amount):,.2f} has been processed. "
+                "You should receive your payout shortly. "
+                "Thank you for using Nova Earns!"
+            ),
+        )
     return request
