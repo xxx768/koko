@@ -610,6 +610,8 @@
                 document.getElementById('loadingMsg').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
 
+                
+
                 // update avatar initial
                 const initial = document.getElementById('avatarInitial');
                 if (initial && data.username) {
@@ -645,7 +647,8 @@
                     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
                 });
                 const data = await res.json();
-                if (!res.ok) { errorEl.textContent = data.detail || 'Unable to claim bonus.';
+                if (!res.ok) { 
+                    errorEl.textContent = data.detail || 'Unable to claim bonus.';
                     errorEl.style.display = 'block'; return; }
                 successEl.textContent = `Bonus claimed successfully! Added ₦${Number(data.bonus_amount || 0).toFixed(2)}.`;
                 successEl.style.display = 'block';

@@ -20,6 +20,7 @@ from app.models import (  # noqa: F401
     withdrawal_setting,
     referral,
     announcement,
+    password_reset_code,
 )
 
 config = context.config
